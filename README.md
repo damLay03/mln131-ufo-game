@@ -2,10 +2,12 @@
 
 Game kết bài cho phần thuyết trình *Xây dựng gia đình Việt Nam trong thời kỳ quá độ lên chủ nghĩa xã hội*. Toàn bộ game nằm trong một file `index.html`, chạy offline, không cần cài đặt hay mạng.
 
+**Chơi online:** https://mln131-ufo-game.vercel.app
+
 ## Cách chạy
 
+- **Online:** mở https://mln131-ufo-game.vercel.app
 - **Offline:** tải repo về, mở `index.html` bằng Chrome hoặc Edge.
-- **Online:** bật GitHub Pages (Settings → Pages → Branch `main`, thư mục `/root`), rồi mở link Pages.
 
 Lần đầu bấm vào trang để trình duyệt cho phát âm thanh. Nên bấm **Toàn màn hình** khi chiếu.
 

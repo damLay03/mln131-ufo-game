@@ -167,7 +167,6 @@ button{font-family:inherit}
 .btn.main{background:var(--lime);color:#14180a}
 .btn small{opacity:.6;font-weight:600}
 .ans{font-size:clamp(26px,3vw,40px);font-weight:700;line-height:1.35;margin:14px 0}
-.by{font-size:24px;color:var(--muted)}.by b{color:var(--lime)}
 h2.big{font-size:clamp(40px,5.5vw,72px);font-weight:900;line-height:1.1;margin:8px 0}
 .lead{font-size:24px;color:var(--muted);line-height:1.45}
 label{display:block;font-weight:700;font-size:18px;margin:18px 0 8px}
@@ -262,50 +261,43 @@ kbd{background:#2a3170;border-radius:5px;padding:1px 7px;font-family:inherit;fon
 /* ============ CÂU HỎI MẶC ĐỊNH ============
    Có thể sửa ngay trong game: màn hình đầu → "Sửa câu hỏi".
    q: câu hỏi · options: các phương án (2–6) · correct: số thứ tự phương án đúng, đếm từ 0 (0 = A, 1 = B…)
-   hint: gợi ý · explain: giải thích sau khi chấm · by: thành viên phụ trách nói thêm */
+   hint: gợi ý · explain: giải thích sau khi chấm */
 const DEFAULT_QUESTIONS = [
   {q:"Yếu tố nào không được giáo trình nêu là tác động đến sự biến đổi của gia đình Việt Nam trong thời kỳ quá độ?",
    options:["Kinh tế thị trường định hướng xã hội chủ nghĩa","Công nghiệp hóa, hiện đại hóa gắn với kinh tế tri thức","Toàn cầu hóa, hội nhập quốc tế, cách mạng khoa học và công nghệ","Sự quay trở lại của kinh tế tự cấp tự túc"],
    correct:3,
    hint:"Gợi ý: kinh tế gia đình đang đi tới, hay đi lùi?",
-   explain:"A, B, C cùng với chủ trương, chính sách của Đảng và Nhà nước là các yếu tố giáo trình nêu (tr.257). Thực tế kinh tế gia đình đang đi theo hướng ngược lại: rời bỏ tự cấp tự túc. (Slide: Bối cảnh tác động)",
-   by:"Đức"},
+   explain:"A, B, C cùng với chủ trương, chính sách của Đảng và Nhà nước là các yếu tố giáo trình nêu (tr.257). Thực tế kinh tế gia đình đang đi theo hướng ngược lại: rời bỏ tự cấp tự túc. (Slide: Bối cảnh tác động)"},
   {q:"Loại hình gia đình nào đang trở nên rất phổ biến ở cả đô thị và nông thôn?",
    options:["Gia đình ba, bốn thế hệ cùng chung sống","Gia đình đơn thân","Gia đình hạt nhân, gồm hai thế hệ cha mẹ và con cái","Gia đình dòng họ"],
    correct:2,
    hint:"Gợi ý: kiểu gia đình chỉ có hai thế hệ…",
-   explain:"Theo giáo trình, gia đình đơn (gia đình hạt nhân) đang rất phổ biến. Gia đình hiện đại chỉ có hai thế hệ cùng sống chung là cha mẹ và con cái. Đơn thân chỉ là số ít (tr.258). (Slide: Biến đổi quy mô gia đình; Gia đình hạt nhân)",
-   by:"Bảo"},
+   explain:"Theo giáo trình, gia đình đơn (gia đình hạt nhân) đang rất phổ biến. Gia đình hiện đại chỉ có hai thế hệ cùng sống chung là cha mẹ và con cái. Đơn thân chỉ là số ít (tr.258). (Slide: Biến đổi quy mô gia đình; Gia đình hạt nhân)"},
   {q:"So với gia đình truyền thống, nhu cầu về con cái ngày nay thay đổi thế nào?",
    options:["Càng đông con càng tốt","Nhất thiết phải có con trai nối dõi","Giảm số con mong muốn và giảm nhu cầu nhất thiết phải có con trai","Không còn chịu sự điều chỉnh của chính sách Nhà nước"],
    correct:2,
    hint:"Gợi ý: mức sinh đang tăng hay giảm?",
-   explain:"Gia đình truyền thống cần có con, càng đông càng tốt, phải có con trai. Ngày nay mức sinh giảm, số con mong muốn giảm, nhu cầu có con trai cũng giảm. Việc sinh con vẫn chịu sự điều chỉnh của chính sách Nhà nước, nên D sai (tr.259–260). (Slide: Biến đổi chức năng tái sản xuất con người)",
-   by:"Phúc"},
+   explain:"Gia đình truyền thống cần có con, càng đông càng tốt, phải có con trai. Ngày nay mức sinh giảm, số con mong muốn giảm, nhu cầu có con trai cũng giảm. Việc sinh con vẫn chịu sự điều chỉnh của chính sách Nhà nước, nên D sai (tr.259–260). (Slide: Biến đổi chức năng tái sản xuất con người)"},
   {q:"Kinh tế gia đình Việt Nam đã có hai bước chuyển mang tính bước ngoặt nào?",
    options:["Từ sản xuất hàng hóa về tự cấp tự túc; từ thị trường toàn cầu về thị trường trong nước","Từ tự cấp tự túc sang kinh tế hàng hóa; từ đáp ứng thị trường quốc gia sang đáp ứng thị trường toàn cầu","Từ kinh tế tập thể sang kinh tế tư nhân; từ nông nghiệp sang dịch vụ","Từ làm thuê sang làm chủ; từ thành thị về nông thôn"],
    correct:1,
    hint:"Gợi ý: làm ra để bán, và bán ra cả thế giới…",
-   explain:"Đây đúng là hai bước chuyển giáo trình nêu (tr.260–261). (Slide: Biến đổi chức năng kinh tế của gia đình)",
-   by:"Phúc"},
+   explain:"Đây đúng là hai bước chuyển giáo trình nêu (tr.260–261). (Slide: Biến đổi chức năng kinh tế của gia đình)"},
   {q:"Trong xã hội hiện nay, quan hệ giữa giáo dục gia đình và giáo dục xã hội ra sao?",
    options:["Giáo dục gia đình là cơ sở của giáo dục xã hội","Giáo dục xã hội bao trùm lên giáo dục gia đình và đưa ra mục tiêu, yêu cầu cho giáo dục gia đình","Giáo dục gia đình chỉ còn dạy đạo đức, ứng xử trong dòng họ","Gia đình không còn đầu tư cho việc học của con"],
    correct:1,
    hint:"Gợi ý: ý A chỉ đúng với xã hội truyền thống…",
-   explain:"A chỉ đúng với xã hội truyền thống. Ngày nay giáo dục xã hội bao trùm lên giáo dục gia đình. Gia đình cũng đầu tư tài chính cho con học nhiều hơn, và dạy cả kiến thức khoa học hiện đại, không chỉ đạo đức (tr.261–262). (Slide: Gia đình đồng hành trong giáo dục)",
-   by:"Việt"},
+   explain:"A chỉ đúng với xã hội truyền thống. Ngày nay giáo dục xã hội bao trùm lên giáo dục gia đình. Gia đình cũng đầu tư tài chính cho con học nhiều hơn, và dạy cả kiến thức khoa học hiện đại, không chỉ đạo đức (tr.261–262). (Slide: Gia đình đồng hành trong giáo dục)"},
   {q:"Ngoài mô hình người chồng làm chủ gia đình, giáo trình nêu thêm mô hình nào?",
    options:["Con trưởng làm chủ gia đình","Ông bà làm chủ gia đình","Người vợ làm chủ, và cả hai vợ chồng cùng làm chủ gia đình","Không còn ai làm chủ gia đình"],
    correct:2,
    hint:"Gợi ý: nghĩ tới bình đẳng vợ chồng…",
-   explain:"Hiện nay còn ít nhất hai mô hình khác: người vợ làm chủ và cả hai vợ chồng cùng làm chủ. Người chủ gia đình là người có phẩm chất, năng lực và đóng góp vượt trội (tr.265). (Slide: Vợ chồng bình đẳng, cùng trách nhiệm)",
-   by:"Nhân"},
+   explain:"Hiện nay còn ít nhất hai mô hình khác: người vợ làm chủ và cả hai vợ chồng cùng làm chủ. Người chủ gia đình là người có phẩm chất, năng lực và đóng góp vượt trội (tr.265). (Slide: Vợ chồng bình đẳng, cùng trách nhiệm)"},
   {q:"Đâu không phải một trong bốn phương hướng cơ bản xây dựng gia đình Việt Nam?",
    options:["Tăng cường sự lãnh đạo của Đảng, nâng cao nhận thức của xã hội về xây dựng và phát triển gia đình","Đẩy mạnh phát triển kinh tế – xã hội, nâng cao đời sống vật chất, kinh tế hộ gia đình","Xóa bỏ giá trị gia đình truyền thống để xây dựng gia đình hiện đại","Tiếp tục phát triển và nâng cao chất lượng phong trào xây dựng gia đình văn hóa"],
    correct:2,
    hint:"Gợi ý: truyền thống nên kế thừa hay xóa bỏ?",
-   explain:"Phương hướng thứ ba là kế thừa giá trị gia đình truyền thống, đồng thời tiếp thu tiến bộ của nhân loại, chứ không xóa bỏ truyền thống (tr.266–268). (Slide: Bốn phương hướng cơ bản)",
-   by:"Minh Anh"},
+   explain:"Phương hướng thứ ba là kế thừa giá trị gia đình truyền thống, đồng thời tiếp thu tiến bộ của nhân loại, chứ không xóa bỏ truyền thống (tr.266–268). (Slide: Bốn phương hướng cơ bản)"},
 ];
 const LETTERS="ABCDEF", MAX_OPTS=6;
 const clone = o => JSON.parse(JSON.stringify(o));
@@ -316,7 +308,7 @@ function normalizeQuestions(arr){
     const options=(Array.isArray(x.options)?x.options:[]).slice(0,MAX_OPTS).map(o=>String(o??""));
     while(options.length<2)options.push("");
     let correct=parseInt(x.correct); if(!(correct>=0&&correct<options.length))correct=0;
-    return {q:String(x.q??""),options,correct,hint:String(x.hint??""),explain:String(x.explain??x.a??""),by:String(x.by??"")};
+    return {q:String(x.q??""),options,correct,hint:String(x.hint??""),explain:String(x.explain??x.a??"")};
   });
   return out.length?out:null;
 }
@@ -997,7 +989,6 @@ function showAnswer(){
     <div class="q sm">${esc(q.q)}</div>
     <div class="ans"><span class="good">Đáp án ${LETTERS[q.correct]}.</span> ${esc(q.options[q.correct])}</div>
     ${q.explain?`<div class="lead">${esc(q.explain)}</div>`:""}
-    ${q.by?`<div class="by" style="margin-top:12px">Mời <b>${esc(q.by)}</b> nói thêm một câu.</div>`:""}
     <div class="btns"><button class="btn main" onclick="nextQ()">${qi+1<QUESTIONS.length?"Câu tiếp theo":"Xem kết cục"} ▶ <small>(Space)</small></button></div>`;
   overlay.classList.add("show");
 }
@@ -1153,10 +1144,8 @@ function qBlock(q,i){
     <div class="sub">Phương án (chọn ô tròn ở phương án đúng)</div>
     ${opts}
     ${q.options.length<MAX_OPTS?`<button class="mini" style="margin:4px 0 0 34px" onclick="edAddOpt(${i})">+ Thêm phương án</button>`:""}
-    <div class="two">
-      <div><div class="sub">Gợi ý (không bắt buộc)</div><input type="text" value="${esc(q.hint)}" oninput="draft[${i}].hint=this.value"></div>
-      <div><div class="sub">Người nói thêm (không bắt buộc)</div><input type="text" value="${esc(q.by)}" oninput="draft[${i}].by=this.value"></div>
-    </div>
+    <div class="sub">Gợi ý (không bắt buộc)</div>
+    <input type="text" value="${esc(q.hint)}" oninput="draft[${i}].hint=this.value">
     <div class="sub">Giải thích hiện sau khi chấm (không bắt buộc)</div>
     <textarea rows="2" oninput="draft[${i}].explain=this.value">${esc(q.explain)}</textarea>
   </div>`;
@@ -1170,7 +1159,7 @@ function edDelOpt(i,j){
   renderEditor();
 }
 function edAdd(){
-  draft.push({q:"",options:["","","",""],correct:0,hint:"",explain:"",by:""});
+  draft.push({q:"",options:["","","",""],correct:0,hint:"",explain:""});
   renderEditor(); card.scrollTop=card.scrollHeight;
 }
 function edDel(i){
@@ -1192,7 +1181,7 @@ function edValidate(){
     const options=[]; let correct=0;
     d.options.forEach((o,j)=>{if(o.trim()){if(j===d.correct)correct=options.length;options.push(o.trim())}});
     if(options.length<2)return {err:`${n}: cần ít nhất 2 phương án có nội dung.`};
-    out.push({q:d.q.trim(),options,correct,hint:d.hint.trim(),explain:d.explain.trim(),by:d.by.trim()});
+    out.push({q:d.q.trim(),options,correct,hint:d.hint.trim(),explain:d.explain.trim()});
   }
   return {qs:out};
 }

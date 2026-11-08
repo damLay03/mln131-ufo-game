@@ -16,7 +16,7 @@ Lần đầu bấm vào trang để trình duyệt cho phát âm thanh. Nên b�
 1. Dán danh sách lớp vào màn hình đầu, mỗi dòng một tên. Bạn nữ thì ghi thêm `(nữ)` sau tên, ví dụ `Châu (nữ)`; không ghi thì game vẽ nhân vật nam. Chọn số giây cho mỗi câu (mặc định 20).
 2. UFO bay lượn trên sân trường, ai đứng gần thì bỏ chạy. Cuối cùng UFO chiếu tia vào một người, người đó chọn đáp án cho câu hỏi trắc nghiệm. Người điều khiển bấm vào phương án người đó chọn.
 3. Chọn **đúng** thì được an toàn và nhận kẹo. Chọn **sai hoặc hết giờ** thì bị hút lên UFO và hiện trong kính UFO.
-4. Sau mỗi câu, game hiện đáp án đúng, phần giải thích và mời thành viên phụ trách nói thêm.
+4. Sau mỗi câu, game hiện đáp án đúng và phần giải thích.
 5. Hết câu hỏi: **hơn 50% đúng** thì Trái Đất thắng, ngược lại UFO thắng. Cả hai kết cục đều có plot twist.
 
 ## Twist và sự cố ngẫu nhiên
@@ -44,7 +44,7 @@ Xuyên suốt game có những gợi ý nhỏ (người ngoài hành tinh ghi ch
 
 Ở màn hình đầu, bấm **Sửa câu hỏi**. Bạn có thể:
 
-- sửa nội dung câu hỏi, các phương án (2 đến 6 phương án), gợi ý, giải thích và người nói thêm;
+- sửa nội dung câu hỏi, các phương án (2 đến 6 phương án), gợi ý và giải thích;
 - bấm ô tròn cạnh phương án để đánh dấu đáp án đúng;
 - thêm, xóa, đổi thứ tự câu hỏi;
 - **Xuất file** để tải bộ câu hỏi về dạng `.json`, **Nhập file** để nạp lại;
@@ -52,7 +52,7 @@ Xuyên suốt game có những gợi ý nhỏ (người ngoài hành tinh ghi ch
 
 Bấm **Lưu và quay lại** để áp dụng. Câu hỏi đã sửa chỉ lưu trong trình duyệt của máy đang dùng. Muốn chiếu trên máy khác thì xuất file trên máy này, rồi nhập file trên máy kia.
 
-Bộ câu hỏi mặc định nằm trong `index.html`, ở `const DEFAULT_QUESTIONS`. Mỗi câu có `q` (câu hỏi), `options` (các phương án), `correct` (số thứ tự phương án đúng, đếm từ 0: 0 là A, 1 là B…), `hint`, `explain`, `by`.
+Bộ câu hỏi mặc định nằm trong `index.html`, ở `const DEFAULT_QUESTIONS`. Mỗi câu có `q` (câu hỏi), `options` (các phương án), `correct` (số thứ tự phương án đúng, đếm từ 0: 0 là A, 1 là B…), `hint` (gợi ý), `explain` (giải thích).
 
 Câu chọc khi bị bắt nằm ở `ABDUCT_LINES`, câu khen khi trả lời đúng nằm ở `SAFE_LINES`, các gợi ý về gia đình UFO nằm ở `FAMILY_HINTS`, lời thoại cuối game nằm ở `TWIST_WIN` và `TWIST_LOSE`.
 

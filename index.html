@@ -5,77 +5,139 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>UFO xâm lăng – Ôn tập Nhóm 6</title>
 <style>
-:root{--sky1:#060a1c;--sky2:#171d48;--ok:#3ddc84;--bad:#ff5a6e;--ink:#eef2ff;--muted:#9aa3c7;--card:#11163a;--lime:#e8ff8a;--s:1}
+:root{--sky1:#070b22;--sky2:#1d2460;--ok:#3ddc84;--bad:#ff5a6e;--ink:#eef2ff;--muted:#9aa3c7;--card:#11163a;--lime:#e8ff8a;--s:1}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden;background:var(--sky1);color:var(--ink);font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif}
 button{font-family:inherit}
-#stage{position:fixed;inset:0;background:radial-gradient(ellipse at 50% 125%,#2d3175 0%,var(--sky2) 38%,var(--sky1) 78%);transition:background 1.5s}
-#stage.doom{background:radial-gradient(ellipse at 50% 125%,#b3132e 0%,#520b20 42%,#16030b 82%)}
+#stage{position:fixed;inset:0;background:radial-gradient(ellipse at 50% 120%,#3a3f8f 0%,var(--sky2) 40%,var(--sky1) 80%);transition:background 1.5s}
+#stage.doom{background:radial-gradient(ellipse at 50% 120%,#b3132e 0%,#520b20 42%,#16030b 82%)}
 .star{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;opacity:.7;animation:tw 3s infinite ease-in-out}
 @keyframes tw{50%{opacity:.12}}
-#ground{position:absolute;left:0;right:0;bottom:0;height:14vh;background:linear-gradient(#1c3d2b,#0c1d15);border-top:2px solid #2f6b47}
 
-/* HUD */
+/* ===== bối cảnh sân trường ===== */
+#bg{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
+#bg .win{fill:#1b2252}
+#bg .win.lit{fill:#ffd77a}
+#bg .win.flick{animation:flick2 3.2s infinite}
+@keyframes flick2{0%,40%,44%,100%{fill:#ffd77a}42%{fill:#1b2252}}
+#bg .moon{filter:drop-shadow(0 0 28px rgba(255,240,190,.75))}
+#bg .flag{transform-box:fill-box;transform-origin:left center;animation:flag 1.6s ease-in-out infinite alternate}
+@keyframes flag{to{transform:skewY(4deg) scaleX(.94)}}
+.doom #bg .win.lit{fill:#ff7a7a}
+.doom #bg .moon{fill:#ff9a9a}
+
+/* ===== HUD ===== */
 #hud{position:absolute;top:0;left:0;right:0;height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;z-index:20}
 .score{display:flex;gap:12px;font-size:20px;font-weight:700}
-.pill{padding:7px 14px;border-radius:999px;background:rgba(255,255,255,.08);white-space:nowrap}
+.pill{padding:7px 14px;border-radius:999px;background:rgba(10,14,40,.55);white-space:nowrap}
 .pill b{font-size:24px}
 .pill.earth b{color:var(--ok)}.pill.ufo b{color:var(--bad)}
 #mainBtn{font-size:22px;font-weight:800;padding:12px 26px;border-radius:14px;border:0;cursor:pointer;background:var(--lime);color:#14180a;box-shadow:0 0 24px rgba(232,255,138,.45);transition:opacity .2s,transform .2s}
 #mainBtn:hover{transform:scale(1.04)}
 #mainBtn:disabled{opacity:0;pointer-events:none}
-.hbtn{background:rgba(255,255,255,.1);border:0;color:var(--ink);font-size:15px;padding:9px 13px;border-radius:9px;cursor:pointer;margin-left:6px}
+.hbtn{background:rgba(10,14,40,.55);border:0;color:var(--ink);font-size:15px;padding:9px 13px;border-radius:9px;cursor:pointer;margin-left:6px}
 
-/* UFO */
-#ufo{position:absolute;width:220px;height:110px;left:calc(50% - 110px);top:90px;z-index:10;transition-property:left,top;transition-timing-function:cubic-bezier(.5,0,.3,1);transition-duration:.6s}
+/* ===== UFO ===== */
+#ufo,.ufo-extra{position:absolute;width:260px;height:120px;left:calc(50% - 130px);top:80px;z-index:10;transition-property:left,top;transition-timing-function:cubic-bezier(.5,0,.3,1);transition-duration:.6s}
 .bob{width:100%;height:100%;position:relative;animation:bob 2.2s ease-in-out infinite}
 @keyframes bob{50%{transform:translateY(-10px)}}
-.dome{position:absolute;left:60px;top:0;width:100px;height:62px;border-radius:50px 50px 12px 12px;background:radial-gradient(circle at 35% 28%,rgba(255,255,255,.75),rgba(140,220,255,.35) 42%,rgba(80,160,220,.22));border:2px solid rgba(180,230,255,.6);overflow:hidden}
-.pilot{position:absolute;left:32px;top:18px;width:36px;height:46px;background:#6fdc7a;border-radius:50% 50% 42% 42%}
-.pilot::before,.pilot::after{content:"";position:absolute;top:12px;width:10px;height:15px;background:#0b0f24;border-radius:50%}
-.pilot::before{left:6px;transform:rotate(-22deg)}.pilot::after{right:6px;transform:rotate(22deg)}
-.hull{position:absolute;left:0;top:46px;width:220px;height:46px;border-radius:50%;background:linear-gradient(#eef1f8,#8f98b2 58%,#59617e);box-shadow:0 8px 24px rgba(0,0,0,.55)}
-.rim{position:absolute;left:22px;top:66px;width:176px;display:flex;justify-content:space-around}
-.rim i{width:12px;height:12px;border-radius:50%;background:#7ef6ff;box-shadow:0 0 8px #7ef6ff;animation:blink 1s infinite}
-.rim i:nth-child(even){animation-delay:.5s;background:#ffd36e;box-shadow:0 0 8px #ffd36e}
-@keyframes blink{50%{opacity:.25}}
-.under{position:absolute;left:75px;top:84px;width:70px;height:16px;border-radius:0 0 50% 50%;background:#454c6b}
-#ufo.angry .rim i,.ufo-extra .rim i{background:var(--bad);box-shadow:0 0 10px var(--bad)}
+.dome{position:absolute;left:75px;top:4px;width:110px;height:78px;border-radius:55px 55px 10px 10px;overflow:hidden;background:radial-gradient(circle at 50% 75%,rgba(70,140,190,.6),rgba(18,36,80,.85))}
+.dome .alien{position:absolute;left:27px;top:6px;width:56px;height:56px}
+.dome .baby{position:absolute;right:8px;bottom:12px;width:30px;height:30px;transform:translateY(44px);transition:transform .45s cubic-bezier(.3,1.5,.5,1)}
+.dome.peek .baby{transform:translateY(0)}
+.capL,.capR{position:absolute;bottom:15px;display:flex}
+.capL{left:3px}.capR{right:3px;flex-direction:row-reverse}
+.cap{width:16px;height:21px;margin:0 -4px;animation:bang .45s ease-in-out infinite alternate}
+.cap:nth-child(even){animation-delay:.2s}
+.cap svg{width:100%;height:100%}
+@keyframes bang{from{transform:translateY(0) rotate(-6deg)}to{transform:translateY(-3px) rotate(6deg)}}
+.glass{position:absolute;inset:0;border-radius:inherit;border:2px solid rgba(180,230,255,.6);background:radial-gradient(circle at 30% 20%,rgba(255,255,255,.65),rgba(255,255,255,0) 32%);pointer-events:none}
+.hull{position:absolute;left:0;top:54px;width:260px;height:66px;filter:drop-shadow(0 8px 14px rgba(0,0,0,.5))}
+.lt{fill:#7ef6ff;animation:ublink 1s infinite}
+.lt.b{fill:#ffd36e;animation-delay:.5s}
+@keyframes ublink{50%{opacity:.25}}
+#ufo.angry .lt,.ufo-extra .lt{fill:var(--bad)}
+.pencil{transform-box:fill-box;transform-origin:bottom center;animation:scribble .18s infinite alternate}
+@keyframes scribble{to{transform:rotate(30deg) translate(2px,-1px)}}
 .shake{animation:shake .12s 6}
 @keyframes shake{25%{transform:translate(-6px,2px) rotate(-3deg)}75%{transform:translate(6px,-2px) rotate(3deg)}}
 
-/* beam */
-#beam{position:absolute;z-index:5;width:190px;clip-path:polygon(36% 0,64% 0,100% 100%,0 100%);background:linear-gradient(rgba(225,255,165,.9),rgba(190,255,140,.18));opacity:0;transition:opacity .25s;pointer-events:none}
-#beam.on{opacity:1;animation:flick .12s infinite alternate}
+/* tia hút */
+#beam{position:absolute;z-index:5;width:190px;clip-path:polygon(38% 0,62% 0,100% 100%,0 100%);background:linear-gradient(rgba(225,255,165,.9),rgba(190,255,140,.18));opacity:0;transition:opacity .2s;pointer-events:none}
+#beam.on{opacity:1;animation:bflick .12s infinite alternate}
 #beam.red{background:linear-gradient(rgba(255,130,150,.95),rgba(255,90,110,.2))}
-@keyframes flick{to{filter:brightness(1.35)}}
+#beam.gold{background:linear-gradient(rgba(255,236,160,.9),rgba(255,214,120,.1))}
+@keyframes bflick{to{filter:brightness(1.35)}}
+.zap{position:fixed;height:5px;border-radius:3px;background:linear-gradient(90deg,#fff,#ff5a6e);box-shadow:0 0 12px #ff5a6e;transform-origin:0 50%;z-index:9;pointer-events:none}
 
-/* crowd */
-#crowd{position:absolute;left:3vw;right:3vw;bottom:2.5vh;display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-end;gap:calc(var(--s)*12px) calc(var(--s)*8px);z-index:6}
-.p{width:calc(var(--s)*100px);display:flex;flex-direction:column;align-items:center;transition:transform .3s,opacity .3s}
-.fig{position:relative;width:calc(var(--s)*44px);height:calc(var(--s)*62px)}
-.head{position:absolute;left:50%;top:0;width:calc(var(--s)*26px);height:calc(var(--s)*26px);transform:translateX(-50%);border-radius:50%;background:#f0c9a4}
-.body{position:absolute;left:50%;bottom:0;width:calc(var(--s)*42px);height:calc(var(--s)*34px);transform:translateX(-50%);border-radius:calc(var(--s)*18px) calc(var(--s)*18px) 6px 6px;background:var(--c)}
-.nm{margin-top:4px;font-size:calc(var(--s)*15px);font-weight:600;text-align:center;line-height:1.15;max-width:100%;background:rgba(0,0,0,.4);padding:2px 6px;border-radius:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.p.scan .fig{filter:drop-shadow(0 0 12px #e1ff9c)}
-.p.target{transform:translateY(-10px)}
+/* ===== nhân vật chibi ===== */
+#crowd{position:absolute;left:2vw;right:2vw;bottom:1.2vh;display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-end;gap:calc(var(--s)*2px) calc(var(--s)*6px);z-index:6}
+.p{width:calc(var(--s)*88px);position:relative}
+.mover{display:flex;flex-direction:column;align-items:center;transition:transform .55s cubic-bezier(.3,.7,.4,1)}
+.jump{width:calc(var(--s)*80px);height:calc(var(--s)*104px)}
+.fig{width:100%;height:100%;overflow:visible;display:block;transition:transform .15s}
+.fig.flip{transform:scaleX(-1)}
+.fig .armL,.fig .armR,.fig .legL,.fig .legR,.fig .head{transform-box:view-box;transition:transform .25s}
+.fig .armL{transform-origin:29px 82px}.fig .armR{transform-origin:71px 82px}
+.fig .legL{transform-origin:44px 100px}.fig .legR{transform-origin:56px 100px}
+.fig .head{transform-origin:50px 76px}
+.fig .eyes{transform-box:fill-box;transform-origin:center;animation:blink 4.5s infinite;animation-delay:var(--bd,0s)}
+@keyframes blink{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
+.nm{margin-top:2px;font-size:calc(var(--s)*15px);font-weight:700;text-align:center;line-height:1.15;max-width:100%;background:rgba(5,8,25,.6);padding:2px 7px;border-radius:7px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.lbl{font-size:calc(var(--s)*12px);color:var(--bad);font-weight:700;margin-top:2px;display:none}
+/* tư thế */
+.p.wave .armR{animation:wave .35s ease-in-out infinite alternate}
+@keyframes wave{from{transform:rotate(-125deg)}to{transform:rotate(-165deg)}}
+.p.cheer .armL{transform:rotate(155deg)}.p.cheer .armR{transform:rotate(-155deg)}
+.p.cover .armL{transform:rotate(140deg)}.p.cover .armR{transform:rotate(-140deg)}
+.p.tilt .head{transform:rotate(-12deg)}
+.p.run .legL,.p.run .armR{animation:swA .17s infinite alternate}
+.p.run .legR,.p.run .armL{animation:swB .17s infinite alternate}
+@keyframes swA{from{transform:rotate(30deg)}to{transform:rotate(-30deg)}}
+@keyframes swB{from{transform:rotate(-30deg)}to{transform:rotate(30deg)}}
+/* chuyển động cả người (thứ tự quan trọng: sau thắng trước) */
+.p.tremble .jump{animation:tremble .08s infinite alternate}
+@keyframes tremble{from{transform:translateX(-1.6px)}to{transform:translateX(1.6px)}}
+.p.run .jump{animation:runbob .17s infinite alternate}
+@keyframes runbob{to{transform:translateY(-6px)}}
+.p.bounce .jump{animation:hop .55s infinite;animation-delay:var(--hd,0s)}
+.p.hop .jump{animation:hop .45s cubic-bezier(.3,1.5,.5,1)}
+@keyframes hop{50%{transform:translateY(-22px)}}
+/* trạng thái */
 .p.target .nm{background:var(--lime);color:#111}
-.p.safe .nm{background:rgba(61,220,132,.28);box-shadow:0 0 0 2px var(--ok)}
-.p.safe .fig::after{content:"✓";position:absolute;top:-4px;right:calc(var(--s)*-12px);background:var(--ok);color:#03210f;border-radius:50%;width:calc(var(--s)*22px);height:calc(var(--s)*22px);font-size:calc(var(--s)*14px);font-weight:900;display:grid;place-items:center}
-.p.gone .fig{visibility:hidden}
+.p.safe .nm{background:rgba(61,220,132,.3);box-shadow:0 0 0 2px var(--ok)}
+.p.gone .jump{visibility:hidden}
 .p.gone .nm{text-decoration:line-through;opacity:.55}
-.p .lbl{font-size:calc(var(--s)*12px);color:var(--bad);font-weight:700;margin-top:2px;display:none}
 .p.gone .lbl{display:block}
 .p.absent{opacity:.3}
+.p.burnt .hairc{fill:#3b3b3b}
+.p.burnt .soot{display:inline}
+.soot{display:none}
 
-/* caption */
+/* ===== bong bóng thoại ===== */
+.bubble{position:fixed;z-index:27;max-width:min(380px,80vw);background:#fff;color:#1a1d33;font-size:21px;font-weight:700;line-height:1.3;padding:10px 16px;border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,.45);pointer-events:none;animation:pop .35s cubic-bezier(.2,1.5,.4,1)}
+.bubble::after{content:"";position:absolute;left:var(--tx,50%);bottom:-10px;margin-left:-10px;border:10px solid transparent;border-bottom:0;border-top-color:#fff}
+.bubble.down::after{bottom:auto;top:-10px;border:10px solid transparent;border-top:0;border-bottom-color:#fff}
+.bubble.baby{background:#ffe1ef}.bubble.baby::after{border-top-color:#ffe1ef}.bubble.baby.down::after{border-top-color:transparent;border-bottom-color:#ffe1ef}
+.bubble.radio{background:#d6f6ff;font-style:italic}.bubble.radio::after{border-top-color:#d6f6ff}.bubble.radio.down::after{border-top-color:transparent;border-bottom-color:#d6f6ff}
+
+/* ===== gia đình UFO (kết cục) ===== */
+#family{position:absolute;left:0;right:0;display:none;justify-content:center;align-items:flex-end;gap:18px;z-index:12;pointer-events:none}
+#family.show{display:flex}
+.fam svg{width:100%;height:100%;overflow:visible}
+.fam{animation:fambob 1.4s ease-in-out infinite alternate}
+.fam:nth-child(2){animation-delay:.3s}.fam:nth-child(3){animation-delay:.6s}
+@keyframes fambob{to{transform:translateY(-6px)}}
+.heart{position:fixed;z-index:13;font-size:26px;pointer-events:none;color:#ff6f91}
+
+/* ===== chữ lớn giữa màn hình ===== */
 #caption{position:absolute;left:50%;top:24%;transform:translate(-50%,-50%);z-index:25;text-align:center;pointer-events:none;width:92vw}
 #caption h1{font-size:clamp(48px,7.5vw,104px);font-weight:900;text-shadow:0 6px 0 rgba(0,0,0,.45)}
-#caption p{font-size:clamp(22px,2.5vw,36px);margin-top:10px;font-weight:700;text-shadow:0 3px 8px rgba(0,0,0,.8)}
+#caption p{font-size:clamp(22px,2.5vw,36px);margin-top:10px;font-weight:700;text-shadow:0 3px 8px rgba(0,0,0,.85)}
 .pop{animation:pop .55s cubic-bezier(.2,1.6,.4,1)}
 @keyframes pop{from{transform:scale(.3);opacity:0}}
 
-/* overlay cards */
+/* ===== thẻ nổi ===== */
 #overlay{position:absolute;inset:0;z-index:30;display:none;align-items:center;justify-content:center;background:rgba(3,5,18,.55)}
 #overlay.show{display:flex}
 .card{width:min(980px,92vw);max-height:92vh;overflow:auto;background:var(--card);border:2px solid #3a4590;border-radius:22px;padding:30px 40px;box-shadow:0 24px 70px rgba(0,0,0,.65)}
@@ -84,7 +146,6 @@ button{font-family:inherit}
 .to{font-size:24px;color:var(--muted);margin-top:8px}.to b{color:var(--lime)}
 .q{font-size:clamp(26px,3vw,42px);font-weight:800;line-height:1.28;margin:16px 0 8px;min-height:1.3em}
 .q.sm{font-size:clamp(20px,2vw,28px);color:var(--muted);margin:10px 0 0}
-/* phương án trắc nghiệm */
 .opts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0 4px}
 .optb{display:flex;gap:14px;align-items:center;text-align:left;font-size:clamp(19px,1.9vw,27px);font-weight:700;line-height:1.3;padding:12px 16px;border-radius:14px;border:2px solid #3a4590;background:#0a0e28;color:var(--ink);cursor:pointer;transition:border-color .15s,background .15s,opacity .3s}
 .optb .L{flex:none;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:#2a3170;font-weight:900}
@@ -94,22 +155,6 @@ button{font-family:inherit}
 .optb.wrong{border-color:var(--bad);background:rgba(255,90,110,.22)}.optb.wrong .L{background:var(--bad);color:#2a0008}
 .opts.done .optb:not(.right):not(.wrong){opacity:.4}
 .good{color:var(--ok);font-weight:900}
-/* trình sửa câu hỏi */
-.qed{border:1px solid #3a4590;border-radius:14px;padding:14px 16px;margin:14px 0;background:rgba(255,255,255,.02)}
-.qhead{display:flex;justify-content:space-between;align-items:center;font-size:19px;margin-bottom:8px}
-.qed textarea,.qed input[type=text]{width:100%;height:auto;background:#0a0e28;color:var(--ink);border:1px solid #3a4590;border-radius:9px;padding:9px 11px;font-size:16px;font-family:inherit;resize:vertical}
-.qed .sub{font-size:14px;font-weight:700;color:var(--muted);margin:10px 0 4px}
-.orow{display:flex;align-items:center;gap:8px;margin:6px 0}
-.orow input[type=radio]{width:22px;height:22px;accent-color:var(--ok);flex:none;cursor:pointer}
-.orow .L{flex:none;width:26px;font-weight:900;text-align:center}
-.orow.isright input[type=text]{border-color:var(--ok)}
-.mini{background:rgba(255,255,255,.1);border:0;color:var(--ink);font-size:14px;padding:6px 10px;border-radius:8px;cursor:pointer;margin-left:4px}
-.mini:disabled{opacity:.3;cursor:default}
-.mini.del{color:#ffb3bd}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.bar{position:sticky;bottom:-30px;background:var(--card);padding:12px 0 6px;border-top:1px solid #3a4590}
-.note{font-size:16px;color:var(--muted);margin-top:6px}
-@media(max-width:720px){.opts,.two,.cols{grid-template-columns:1fr}.card{padding:22px 18px}}
 .hint{font-size:24px;color:#ffd27a;min-height:32px}
 .trow{display:flex;align-items:center;gap:16px;margin:16px 0 6px}
 .timer{flex:1;height:18px;background:rgba(255,255,255,.1);border-radius:9px;overflow:hidden}
@@ -118,7 +163,6 @@ button{font-family:inherit}
 .tnum.low{color:var(--bad)}
 .btns{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
 .btn{font-size:20px;font-weight:800;padding:13px 22px;border-radius:12px;border:0;cursor:pointer}
-.btn.ok{background:var(--ok);color:#03210f}.btn.bad{background:var(--bad);color:#2a0008}
 .btn.ghost{background:rgba(255,255,255,.1);color:var(--ink)}
 .btn.main{background:var(--lime);color:#14180a}
 .btn small{opacity:.6;font-weight:600}
@@ -137,12 +181,28 @@ kbd{background:#2a3170;border-radius:5px;padding:1px 7px;font-family:inherit;fon
 .err{color:var(--bad);font-weight:700;min-height:24px;margin-top:8px}
 .puff{position:absolute;border-radius:50%;background:rgba(180,180,190,.7);z-index:11;pointer-events:none}
 .conf{position:fixed;width:12px;height:16px;z-index:24;pointer-events:none}
+/* trình sửa câu hỏi */
+.qed{border:1px solid #3a4590;border-radius:14px;padding:14px 16px;margin:14px 0;background:rgba(255,255,255,.02)}
+.qhead{display:flex;justify-content:space-between;align-items:center;font-size:19px;margin-bottom:8px}
+.qed textarea,.qed input[type=text]{width:100%;height:auto;background:#0a0e28;color:var(--ink);border:1px solid #3a4590;border-radius:9px;padding:9px 11px;font-size:16px;font-family:inherit;resize:vertical}
+.qed .sub{font-size:14px;font-weight:700;color:var(--muted);margin:10px 0 4px}
+.orow{display:flex;align-items:center;gap:8px;margin:6px 0}
+.orow input[type=radio]{width:22px;height:22px;accent-color:var(--ok);flex:none;cursor:pointer}
+.orow .L{flex:none;width:26px;font-weight:900;text-align:center}
+.orow.isright input[type=text]{border-color:var(--ok)}
+.mini{background:rgba(255,255,255,.1);border:0;color:var(--ink);font-size:14px;padding:6px 10px;border-radius:8px;cursor:pointer;margin-left:4px}
+.mini:disabled{opacity:.3;cursor:default}
+.mini.del{color:#ffb3bd}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.bar{position:sticky;bottom:-30px;background:var(--card);padding:12px 0 6px;border-top:1px solid #3a4590}
+.note{font-size:16px;color:var(--muted);margin-top:6px}
+@media(max-width:720px){.opts,.two,.cols{grid-template-columns:1fr}.card{padding:22px 18px}}
 </style>
 </head>
 <body>
 <div id="stage">
   <div id="stars"></div>
-  <div id="ground"></div>
+  <div id="bgwrap"></div>
 
   <div id="hud">
     <div class="score">
@@ -159,12 +219,40 @@ kbd{background:#2a3170;border-radius:5px;padding:1px 7px;font-family:inherit;fon
 
   <div id="beam"></div>
   <div id="ufo"><div class="bob">
-    <div class="dome"><div class="pilot"></div></div>
-    <div class="hull"></div>
-    <div class="rim"><i></i><i></i><i></i><i></i><i></i><i></i></div>
-    <div class="under"></div>
+    <div class="dome" id="dome">
+      <svg class="alien" viewBox="0 0 70 70">
+        <path d="M25 16 Q21 6 14 4" stroke="#6fdc7a" stroke-width="2.5" fill="none"/><circle cx="14" cy="4" r="3.5" fill="#ffd36e"/>
+        <path d="M45 16 Q49 6 56 4" stroke="#6fdc7a" stroke-width="2.5" fill="none"/><circle cx="56" cy="4" r="3.5" fill="#ffd36e"/>
+        <ellipse cx="35" cy="68" rx="19" ry="11" fill="#4fbf63"/>
+        <ellipse cx="35" cy="35" rx="22" ry="21" fill="#6fdc7a"/>
+        <g id="aface"></g>
+        <g id="anote" style="display:none">
+          <g transform="rotate(-8 31 60)"><rect x="19" y="52" width="24" height="17" rx="2" fill="#fff"/><path d="M22 57 h17 M22 61 h14 M22 65 h10" stroke="#8892b0" stroke-width="1.3"/></g>
+          <rect class="pencil" x="44" y="46" width="4" height="17" rx="1" fill="#ffd166"/>
+        </g>
+      </svg>
+      <svg class="baby" viewBox="0 0 40 40">
+        <path d="M20 10 V3" stroke="#a6f3ad" stroke-width="2.5"/><path d="M20 5 l-3.5 -3.5 a2.5 2.5 0 0 1 3.5 -1.2 a2.5 2.5 0 0 1 3.5 1.2z" fill="#ff4d6d"/>
+        <ellipse cx="20" cy="24" rx="16" ry="15" fill="#a6f3ad"/>
+        <ellipse cx="14" cy="23" rx="4" ry="5.5" fill="#0b0f24"/><ellipse cx="26" cy="23" rx="4" ry="5.5" fill="#0b0f24"/>
+        <circle cx="15" cy="21" r="1.5" fill="#fff"/><circle cx="27" cy="21" r="1.5" fill="#fff"/>
+        <path d="M17 31 Q20 34 23 31" stroke="#0b0f24" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+        <ellipse cx="8" cy="29" rx="3" ry="2" fill="#ff8fa3" opacity=".7"/><ellipse cx="32" cy="29" rx="3" ry="2" fill="#ff8fa3" opacity=".7"/>
+      </svg>
+      <div class="capL"></div><div class="capR"></div>
+      <div class="glass"></div>
+    </div>
+    <svg class="hull" viewBox="0 0 260 66">
+      <defs><linearGradient id="hullg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f2f5fc"/><stop offset=".55" stop-color="#98a2bf"/><stop offset="1" stop-color="#565e7d"/></linearGradient></defs>
+      <path d="M92 44 Q130 70 168 44 Z" fill="#454c6b"/>
+      <ellipse cx="130" cy="56" rx="17" ry="4.5" fill="#d8ffb0" opacity=".85"/>
+      <ellipse cx="130" cy="30" rx="128" ry="22" fill="url(#hullg)"/>
+      <ellipse cx="130" cy="22" rx="110" ry="7" fill="#fff" opacity=".35"/>
+      <circle class="lt" cx="28" cy="36" r="5.5"/><circle class="lt b" cx="62" cy="40" r="5.5"/><circle class="lt" cx="96" cy="42" r="5.5"/><circle class="lt b" cx="130" cy="43" r="5.5"/><circle class="lt" cx="164" cy="42" r="5.5"/><circle class="lt b" cx="198" cy="40" r="5.5"/><circle class="lt" cx="232" cy="36" r="5.5"/>
+    </svg>
   </div></div>
 
+  <div id="family"></div>
   <div id="crowd"></div>
   <div id="caption"></div>
   <div id="overlay"><div class="card" id="card"></div></div>
@@ -252,19 +340,163 @@ const SAFE_LINES = [
   "Câu trả lời quá chuẩn. UFO run lẩy bẩy!",
   "{n} vừa cứu cả Trái Đất một bàn.",
 ];
-const SAMPLE_NAMES = ["An","Bình","Châu","Dũng","Giang","Hà","Khoa","Linh","Minh","Nam","Oanh","Phương","Quân","Trang","Uyên","Vy"];
+/* Gợi ý dần plot twist "UFO là một gia đình đi lạc": mỗi câu hỏi xong hiện một bước */
+const FAMILY_HINTS = [
+  [{w:"pilot",e:"write",t:"*ghi chép* Câu trả lời của loài người… thú vị thật."}],
+  [{w:"baby",t:"Bố ơi, mình tới nơi chưa ạ?"},{w:"pilot",e:"shock",t:"Suỵt! Bố đang làm nhiệm vụ!"}],
+  [{w:"pilot",e:"write",t:"*ghi chép* Loài người biết chia sẻ việc nhà… còn nhà mình thì…"}],
+  [{w:"radio",t:"📡 Mẹ: Anh hỏi được đường về nhà chưa đấy?"},{w:"pilot",e:"sad",t:"Đang hỏi đây mà…"}],
+  [{w:"baby",t:"Con nhớ mẹ quá…"},{w:"pilot",e:"sad",t:"Ráng chút nữa thôi con."}],
+  [{w:"pilot",e:"write",t:"*ghi chép* Muốn hạnh phúc thì phải biết lắng nghe nhau…"}],
+];
+const SAMPLE_NAMES = "An\nBình\nChâu (nữ)\nDũng\nGiang (nữ)\nHà (nữ)\nKhoa\nLinh (nữ)\nMinh\nNam\nOanh (nữ)\nPhương (nữ)\nQuân\nTrang (nữ)\nUyên (nữ)\nVy (nữ)";
 const COLORS = ["#ff8a5b","#5bc0ff","#ffd166","#b48cff","#4ce0b3","#ff6f91","#8bd450","#ffa94d","#74a9ff","#f78fb3"];
+const SKINS = ["#ffdcbf","#f8cba6","#eab48b","#d79f73"];
+const HAIRS = ["#1d1a22","#1d1a22","#2b211c","#3a2a20","#4a3426","#5b3b2a"];
+const PANTS = ["#2f3b66","#3b3f4f","#24486b","#4a3f6b","#2e4a3f"];
+const BOWS = ["#ff5d8f","#ffd166","#7ad7ff","#c49bff","#ff8a5b"];
 
 /* ============ trạng thái ============ */
 const $ = s => document.querySelector(s);
-const stage=$("#stage"), ufo=$("#ufo"), beam=$("#beam"), crowd=$("#crowd"), cap=$("#caption"), overlay=$("#overlay"), card=$("#card");
-let people=[], qi=0, right=0, wrong=0, state="setup", current=null;
-let tTotal=20, tLeft=0, timerId=null, paused=false, lastTick=0, ufoX=0, ufoY=90, hintShown=false;
+const stage=$("#stage"), ufo=$("#ufo"), dome=$("#dome"), beam=$("#beam"), crowd=$("#crowd"), cap=$("#caption"), overlay=$("#overlay"), card=$("#card"), fam=$("#family");
+let people=[], qi=0, right=0, wrong=0, state="setup", current=null, plan=[], twistDeck=[], hintStep=0;
+let tTotal=20, tLeft=0, timerId=null, paused=false, lastTick=0, ufoX=0, ufoY=80, hintShown=false;
 const wait = ms => new Promise(r=>setTimeout(r,ms));
 const pick = a => a[Math.floor(Math.random()*a.length)];
+const shuffle = a => {for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
-for(let i=0;i<150;i++){const s=document.createElement("div");s.className="star";s.style.left=Math.random()*100+"vw";s.style.top=Math.random()*80+"vh";s.style.animationDelay=(Math.random()*3)+"s";if(Math.random()<.2){s.style.width=s.style.height="3px"}$("#stars").appendChild(s)}
+for(let i=0;i<150;i++){const s=document.createElement("div");s.className="star";s.style.left=Math.random()*100+"vw";s.style.top=Math.random()*55+"vh";s.style.animationDelay=(Math.random()*3)+"s";if(Math.random()<.2){s.style.width=s.style.height="3px"}$("#stars").appendChild(s)}
+
+/* ============ bối cảnh: sân trường ban đêm ============ */
+function starPts(cx,cy,R,r){let s="";for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,d=i%2?r:R;s+=`${(cx+Math.cos(a)*d).toFixed(1)},${(cy+Math.sin(a)*d).toFixed(1)} `}return s}
+function tree(x,y,k=1){return `<rect x="${x-8*k}" y="${y}" width="${16*k}" height="${130*k}" fill="#3b2a22"/><circle cx="${x}" cy="${y-8*k}" r="${58*k}" fill="#1f4d3a"/><circle cx="${x-34*k}" cy="${y+16*k}" r="${40*k}" fill="#24583f"/><circle cx="${x+34*k}" cy="${y+12*k}" r="${42*k}" fill="#1c4434"/>`}
+function lamp(x){return `<ellipse cx="${x}" cy="762" rx="120" ry="26" fill="url(#lampg)"/><rect x="${x-3}" y="600" width="6" height="140" fill="#596182"/><rect x="${x-16}" y="590" width="32" height="12" rx="4" fill="#596182"/><circle cx="${x}" cy="606" r="9" fill="#fff3c4"/><circle cx="${x}" cy="610" r="46" fill="url(#lampg)"/>`}
+function buildBG(){
+  let w="";
+  for(let row=0;row<4;row++)for(let c=0;c<11;c++){
+    const x=400+c*76; if(x>690&&x<880)continue;
+    const y=398+row*78, lit=Math.random()<.45;
+    w+=`<rect class="win${lit?" lit":""}${lit&&Math.random()<.18?" flick":""}" x="${x}" y="${y}" width="44" height="52" rx="3"/>`;
+  }
+  for(let row=0;row<4;row++)for(let c=0;c<2;c++){const lit=Math.random()<.5;w+=`<rect class="win${lit?" lit":""}" x="${738+c*78}" y="${352+row*72}" width="46" height="46" rx="3"/>`}
+  $("#bgwrap").innerHTML=`<svg id="bg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice">
+    <defs><radialGradient id="lampg"><stop offset="0" stop-color="#ffe9a8" stop-opacity=".55"/><stop offset="1" stop-color="#ffe9a8" stop-opacity="0"/></radialGradient>
+    <linearGradient id="yard" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a3158"/><stop offset="1" stop-color="#121731"/></linearGradient></defs>
+    <circle class="moon" cx="1360" cy="150" r="56" fill="#fff4cf"/><circle cx="1342" cy="136" r="10" fill="#efe2b5"/><circle cx="1378" cy="168" r="7" fill="#efe2b5"/>
+    <path d="M0 650 Q200 575 400 615 T800 605 T1200 595 T1600 625 V760 H0Z" fill="#141a3c"/>
+    <rect x="370" y="372" width="860" height="360" fill="#262d5c"/><rect x="360" y="358" width="880" height="18" rx="3" fill="#323a72"/>
+    <rect x="710" y="300" width="180" height="432" fill="#2c3468"/><polygon points="698,302 800,232 902,302" fill="#353e7c"/>
+    <rect x="722" y="312" width="156" height="32" rx="4" fill="#ffe08a"/><text x="800" y="335" text-anchor="middle" font-size="19" font-weight="800" fill="#3a2a10" font-family="Segoe UI,Arial,sans-serif">GIẢNG ĐƯỜNG</text>
+    ${w}
+    <rect x="762" y="650" width="76" height="82" rx="6" fill="#ffd77a" opacity=".9"/><rect x="740" y="726" width="120" height="8" fill="#3a4378"/>
+    <rect x="268" y="400" width="5" height="332" fill="#b8bfd8"/>
+    <g class="flag"><rect x="273" y="402" width="72" height="48" fill="#da251d"/><polygon points="${starPts(309,426,14,5.6)}" fill="#ffde00"/></g>
+    ${tree(130,600)}${tree(1470,605)}${tree(1290,640,.7)}${tree(330,650,.6)}
+    <rect x="0" y="726" width="1600" height="16" fill="#2f6b47"/>
+    <rect x="0" y="740" width="1600" height="160" fill="url(#yard)"/>
+    <path d="M0 790 H1600 M0 845 H1600" stroke="#3a4270" stroke-width="2" opacity=".5"/>
+    ${lamp(560)}${lamp(1050)}
+  </svg>`;
+}
+buildBG();
+
+/* ============ nhân vật chibi ============ */
+function hash(s){let h=2166136261;for(const c of s){h^=c.codePointAt(0);h=Math.imul(h,16777619)}return h>>>0}
+function rng(seed){return()=>{seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function looks(name,female){
+  const R=rng(hash(name.toLowerCase())), pk=a=>a[Math.floor(R()*a.length)];
+  return {female,skin:pk(SKINS),hair:pk(HAIRS),style:female?pk(["long","pony","buns","bob"]):pk(["short","spiky","side","curly"]),
+    shirt:pk(COLORS),pants:pk(PANTS),glasses:R()<.25,bow:female&&R()<.5,bowC:pk(BOWS),cap:!female&&R()<.15};
+}
+const INK="#2a1d1d", S=`fill="none" stroke="${INK}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"`;
+const CHEEKS=`<ellipse cx="29" cy="58" rx="5" ry="3" fill="#ff7a8a" opacity=".45"/><ellipse cx="71" cy="58" rx="5" ry="3" fill="#ff7a8a" opacity=".45"/>`;
+const SWEAT=`<path d="M77 33 Q72 41 77 45 Q82 41 77 33Z" fill="#8fd3ff" stroke="#5aa9d6" stroke-width=".8"/>`;
+const bigEyes=(r,pr,py=0)=>`<circle cx="39" cy="50" r="${r}" fill="#fff" stroke="${INK}" stroke-width="1.5"/><circle cx="61" cy="50" r="${r}" fill="#fff" stroke="${INK}" stroke-width="1.5"/><circle cx="39" cy="${50+py}" r="${pr}" fill="${INK}"/><circle cx="61" cy="${50+py}" r="${pr}" fill="${INK}"/>`;
+const FACES={
+  happy:`<g class="eyes"><ellipse cx="39" cy="50" rx="3.6" ry="4.6" fill="${INK}"/><ellipse cx="61" cy="50" rx="3.6" ry="4.6" fill="${INK}"/><circle cx="40.3" cy="48.2" r="1.4" fill="#fff"/><circle cx="62.3" cy="48.2" r="1.4" fill="#fff"/></g><path d="M44 60 Q50 66 56 60" ${S}/>${CHEEKS}`,
+  cheer:`<path d="M34 52 Q39 45 44 52 M56 52 Q61 45 66 52" ${S}/><path d="M42 59 Q50 73 58 59 Z" fill="#7a2230"/><path d="M46 66 Q50 70 54 66 Z" fill="#ff8597"/>${CHEEKS}`,
+  scared:`<path d="M33 42 L44 39 M56 39 L67 42" ${S}/>${bigEyes(5.5,2.4,1)}<path d="M43 63 Q46 60 49 63 Q52 66 55 63 Q57 61 58 63" ${S}/>${SWEAT}`,
+  panic:`<path d="M32 40 L44 35 M56 35 L68 40" ${S}/>${bigEyes(6.5,1.8)}<ellipse cx="50" cy="64" rx="5.5" ry="7" fill="#7a2230"/><path d="M41 29 v7 M47 28 v8 M53 28 v8 M59 29 v7" stroke="#5a6cff" stroke-width="2" opacity=".55"/>${SWEAT}<path d="M22 36 Q18 43 22 46 Q26 43 22 36Z" fill="#8fd3ff"/>`,
+  sad:`<path d="M33 42 L44 40 M56 40 L67 42" ${S}/><path d="M34 50 Q39 54 44 50 M56 50 Q61 54 66 50" ${S}/><path d="M37 54 v9 M63 54 v9" stroke="#7fc8ff" stroke-width="3" stroke-linecap="round"/><path d="M44 65 Q50 59 56 65" ${S}/>`,
+  dizzy:`<path d="M35 46 l8 8 M43 46 l-8 8 M57 46 l8 8 M65 46 l-8 8" ${S}/><path d="M43 63 Q46 60 49 63 Q52 66 55 63" ${S}/><text x="50" y="24" text-anchor="middle" font-size="12" fill="#ffd166">★ ★</text>`,
+  relieved:`<path d="M34 50 Q39 53 44 50 M56 50 Q61 53 66 50" ${S}/><path d="M45 61 Q50 64 55 61" ${S}/>${SWEAT}${CHEEKS}`,
+  surprised:`<path d="M33 40 L44 38 M56 38 L67 40" ${S}/>${bigEyes(5,2.8)}<circle cx="50" cy="63" r="3.6" fill="#7a2230"/>`,
+};
+function figSVG(L,face="happy"){
+  const sh=L.shirt, sk=L.skin;
+  const back={long:`<path d="M18 46 Q16 9 50 9 Q84 9 82 46 L85 100 Q68 106 50 103 Q32 106 15 100 Z"/>`,
+    pony:`<path d="M76 30 Q102 40 93 80 Q89 90 83 85 Q91 60 72 40Z"/>`,
+    buns:`<circle cx="23" cy="19" r="12"/><circle cx="77" cy="19" r="12"/>`,
+    bob:`<path d="M16 52 Q13 9 50 9 Q87 9 84 52 Q86 70 74 72 L26 72 Q14 70 16 52Z"/>`}[L.style]||"";
+  const front={short:`<path d="M20 46 Q19 12 50 12 Q81 12 80 46 Q76 30 64 26 Q52 34 38 27 Q27 31 20 46Z"/>`,
+    spiky:`<path d="M20 46 L21 26 L29 21 L30 9 L41 16 L50 4 L59 16 L70 9 L71 21 L79 26 L80 46 Q72 30 50 29 Q28 30 20 46Z"/>`,
+    side:`<path d="M20 46 Q17 11 53 11 Q83 13 80 44 Q78 27 64 23 Q44 31 30 26 Q24 34 20 46Z"/>`,
+    curly:`<circle cx="24" cy="36" r="9"/><circle cx="31" cy="22" r="10"/><circle cx="44" cy="15" r="11"/><circle cx="58" cy="15" r="11"/><circle cx="70" cy="23" r="10"/><circle cx="77" cy="36" r="9"/>`,
+    long:`<path d="M20 48 Q19 11 50 11 Q81 11 80 48 Q77 30 67 26 L61 35 L55 26 L47 35 L41 26 L35 35 Q25 34 20 48Z"/>`,
+    pony:`<path d="M20 48 Q19 11 50 11 Q81 11 80 48 Q74 28 58 25 Q44 33 30 29 Q23 36 20 48Z"/>`,
+    buns:`<path d="M20 48 Q19 13 50 13 Q81 13 80 48 Q76 31 64 28 L58 35 L50 28 L42 35 L36 28 Q24 32 20 48Z"/>`,
+    bob:`<path d="M20 46 Q19 11 50 11 Q81 11 80 46 L80 36 Q50 26 20 36Z"/>`}[L.style];
+  const legC=L.female?sk:L.pants;
+  const body=L.female
+    ?`<path d="M33 80 Q50 74 67 80 L74 108 Q50 114 26 108 Z" fill="${sh}"/><path d="M42 79 L50 86 L58 79" fill="none" stroke="#fff" stroke-width="2" opacity=".7"/>`
+    :`<rect x="31" y="77" width="38" height="30" rx="12" fill="${sh}"/><path d="M43 78 L50 85 L57 78" fill="none" stroke="#fff" stroke-width="2" opacity=".7"/>`;
+  const acc=(L.glasses?`<g fill="none" stroke="#1c2340" stroke-width="2"><circle cx="39" cy="50" r="7.5"/><circle cx="61" cy="50" r="7.5"/><path d="M46.5 50 h7"/></g>`:"")
+    +(L.bow?`<g fill="${L.bowC}"><path d="M60 14 L72 8 L72 22Z"/><path d="M84 14 L72 8 L72 22Z" transform="translate(0,0)"/><circle cx="72" cy="15" r="3.5"/></g>`:"")
+    +(L.style==="pony"?`<circle cx="78" cy="32" r="4" fill="${L.bowC}"/>`:"")
+    +(L.cap?`<path d="M19 34 Q20 8 50 8 Q80 8 81 34Z" fill="${sh}"/><path d="M50 30 Q78 26 96 34 Q78 38 50 34Z" fill="${sh}" opacity=".85"/>`:"");
+  return `<svg class="fig" viewBox="0 0 100 130">
+    <ellipse cx="50" cy="126" rx="22" ry="4" fill="rgba(0,0,0,.35)"/>
+    <g class="legL"><rect x="39" y="98" width="10" height="22" rx="5" fill="${legC}"/><ellipse cx="43" cy="121" rx="7" ry="4" fill="#2a2a35"/></g>
+    <g class="legR"><rect x="51" y="98" width="10" height="22" rx="5" fill="${legC}"/><ellipse cx="57" cy="121" rx="7" ry="4" fill="#2a2a35"/></g>
+    ${body}
+    <g class="armL"><rect x="24.5" y="80" width="9" height="22" rx="4.5" fill="${sh}"/><circle cx="29" cy="102" r="5" fill="${sk}"/></g>
+    <g class="armR"><rect x="66.5" y="80" width="9" height="22" rx="4.5" fill="${sh}"/><circle cx="71" cy="102" r="5" fill="${sk}"/></g>
+    <g class="head">
+      <g class="hairc" fill="${L.hair}">${back}</g>
+      <circle cx="21" cy="50" r="5" fill="${sk}"/><circle cx="79" cy="50" r="5" fill="${sk}"/>
+      <circle cx="50" cy="46" r="30" fill="${sk}"/>
+      <g class="hairc" fill="${L.hair}">${front}</g>
+      <g class="face">${FACES[face]}</g>
+      ${acc}
+      <g class="soot"><circle cx="34" cy="20" r="5" fill="#555" opacity=".7"/><circle cx="60" cy="14" r="6" fill="#666" opacity=".6"/></g>
+    </g>
+  </svg>`;
+}
+
+/* ============ người ngoài hành tinh ============ */
+const E="#0b0f24", AS=`fill="none" stroke="${E}" stroke-width="2.4" stroke-linecap="round"`;
+const AEYES=`<ellipse cx="25" cy="33" rx="6.5" ry="9.5" transform="rotate(-25 25 33)" fill="${E}"/><ellipse cx="45" cy="33" rx="6.5" ry="9.5" transform="rotate(25 45 33)" fill="${E}"/><circle cx="23" cy="29" r="2" fill="#fff"/><circle cx="43" cy="29" r="2" fill="#fff"/>`;
+const HEART=(x,y)=>`<path d="M${x} ${y+6} L${x-6.5} ${y-0.5} Q${x-9} ${y-4} ${x-6} ${y-6.5} Q${x-2.5} ${y-8.5} ${x} ${y-5} Q${x+2.5} ${y-8.5} ${x+6} ${y-6.5} Q${x+9} ${y-4} ${x+6.5} ${y-0.5} Z" fill="#ff4d6d"/>`;
+const ALIEN={
+  smirk:AEYES+`<path d="M28 47 Q36 51 43 45" ${AS}/>`,
+  evil:AEYES+`<path d="M15 21 L30 28 M55 21 L40 28" ${AS} stroke-width="3"/><path d="M24 44 Q35 56 46 44 Z" fill="#fff" stroke="${E}" stroke-width="2"/><path d="M30 45.5 v4 M35 46 v5 M40 45.5 v4" stroke="${E}" stroke-width="1.4"/>`,
+  angry:`<ellipse cx="35" cy="35" rx="22" ry="21" fill="#ff4d6d" opacity=".35"/>`+AEYES+`<path d="M14 20 L31 29 M56 20 L39 29" ${AS} stroke-width="3.2"/><path d="M27 50 Q35 43 43 50" ${AS}/>`,
+  laugh:`<path d="M18 34 Q25 26 32 34 M38 34 Q45 26 52 34" ${AS} stroke-width="3"/><path d="M24 42 Q35 58 46 42 Z" fill="#3a0d1a"/><path d="M29 50 Q35 54 41 50" fill="#ff7a90"/>`,
+  shock:`<ellipse cx="25" cy="32" rx="8" ry="10" fill="#fff" stroke="${E}" stroke-width="2"/><ellipse cx="45" cy="32" rx="8" ry="10" fill="#fff" stroke="${E}" stroke-width="2"/><circle cx="25" cy="33" r="2.6" fill="${E}"/><circle cx="45" cy="33" r="2.6" fill="${E}"/><ellipse cx="35" cy="48" rx="4" ry="5" fill="#3a0d1a"/>`,
+  write:`<ellipse cx="25" cy="37" rx="6" ry="4.5" fill="${E}"/><ellipse cx="45" cy="37" rx="6" ry="4.5" fill="${E}"/><path d="M31 47 h8" ${AS}/>`,
+  sad:`<ellipse cx="25" cy="34" rx="6" ry="8" transform="rotate(20 25 34)" fill="${E}"/><ellipse cx="45" cy="34" rx="6" ry="8" transform="rotate(-20 45 34)" fill="${E}"/><circle cx="24" cy="31" r="1.8" fill="#fff"/><circle cx="44" cy="31" r="1.8" fill="#fff"/><path d="M28 50 Q35 45 42 50" ${AS}/><path d="M21 42 v6" stroke="#7fc8ff" stroke-width="2.5" stroke-linecap="round"/>`,
+  love:HEART(25,33)+HEART(45,33)+`<path d="M28 46 Q35 52 42 46" ${AS}/>`,
+};
+function setAlien(e){$("#aface").innerHTML=ALIEN[e]||ALIEN.smirk;$("#anote").style.display=e==="write"?"":"none";ufo.classList.toggle("angry",e==="angry"||e==="evil")}
+function peekBaby(on){dome.classList.toggle("peek",on)}
+function famSVG(kind){
+  const sk=kind==="baby"?"#a6f3ad":"#6fdc7a", robe={dad:"#5b6cff",mom:"#ff6fa8",baby:"#ffc94d"}[kind];
+  const ant=kind==="baby"
+    ?`<path d="M40 18 V4" stroke="${sk}" stroke-width="3"/>${HEART(40,5)}`
+    :`<path d="M30 20 Q24 8 16 5" stroke="${sk}" stroke-width="3" fill="none"/><circle cx="16" cy="5" r="4" fill="#ffd36e"/><path d="M50 20 Q56 8 64 5" stroke="${sk}" stroke-width="3" fill="none"/><circle cx="64" cy="5" r="4" fill="#ffd36e"/>`;
+  const extra={dad:`<path d="M32 66 L40 70 L48 66 L48 75 L40 71 L32 75Z" fill="#ff4d6d"/>`,
+    mom:`<g fill="#ffd166"><circle cx="60" cy="18" r="4"/><circle cx="66" cy="22" r="4"/><circle cx="60" cy="26" r="4"/><circle cx="54" cy="22" r="4"/></g><circle cx="60" cy="22" r="3" fill="#ff6f91"/><path d="M21 33 l-4 -3 M24 30 l-2 -4 M59 30 l2 -4 M62 33 l4 -3" stroke="${E}" stroke-width="2" stroke-linecap="round"/>`,
+    baby:""}[kind];
+  return `<svg viewBox="0 0 80 110">${ant}
+    <path d="M16 108 Q14 68 40 64 Q66 68 64 108 Z" fill="${robe}"/>
+    <ellipse cx="40" cy="40" rx="27" ry="25" fill="${sk}"/>
+    <ellipse cx="29" cy="40" rx="7" ry="10" transform="rotate(-20 29 40)" fill="${E}"/><ellipse cx="51" cy="40" rx="7" ry="10" transform="rotate(20 51 40)" fill="${E}"/>
+    <circle cx="27" cy="36" r="2.4" fill="#fff"/><circle cx="49" cy="36" r="2.4" fill="#fff"/>
+    <path d="M33 54 Q40 60 47 54" ${AS}/>
+    <ellipse cx="19" cy="51" rx="5" ry="3" fill="#ff8fa3" opacity=".6"/><ellipse cx="61" cy="51" rx="5" ry="3" fill="#ff8fa3" opacity=".6"/>
+    ${extra}</svg>`;
+}
 
 /* ============ âm thanh (tự tổng hợp, không cần file) ============ */
 let ac=null, muted=false;
@@ -285,6 +517,11 @@ const sfx={
   buzz:()=>tone(160,.5,"square",.09,110),
   zap:()=>{tone(900,1.2,"sawtooth",.07,60);tone(300,.8,"square",.04,1400,.3)},
   gulp:()=>tone(220,.3,"sine",.25,55),
+  boing:()=>tone(260,.3,"sine",.22,820),
+  thud:()=>tone(110,.25,"sine",.32,40),
+  pew:()=>tone(1500,.16,"sawtooth",.06,180),
+  glitch:()=>{for(let i=0;i<8;i++)tone(200+Math.random()*1400,.05,"square",.05,null,i*.06)},
+  twist:()=>[330,415,494,622].forEach((f,i)=>tone(f,.35,"triangle",.12,null,i*.18)),
   win:()=>[392,523,659,784,1047,1319].forEach((f,i)=>tone(f,.28,"triangle",.13,null,i*.13)),
   lose:()=>[392,330,262,196,131].forEach((f,i)=>tone(f,.4,"sawtooth",.08,null,i*.28)),
 };
@@ -294,9 +531,17 @@ function toggleFS(){try{document.fullscreenElement?document.exitFullscreen():doc
 /* ============ màn hình thiết lập ============ */
 function loadNames(){try{return localStorage.getItem("ufo_names")||""}catch(e){return ""}}
 function saveNames(v){try{localStorage.setItem("ufo_names",v)}catch(e){}}
+/* Mỗi dòng một tên; thêm "(nữ)" sau tên để vẽ nhân vật nữ */
+function parseNames(raw){
+  return raw.split(/\r?\n/).map(s=>s.normalize("NFC").trim()).filter(Boolean).map(line=>{
+    const m=line.match(/^(.*?)\s*[\(\[]\s*(nữ|nu|nam)\s*[\)\]]\s*$/i);
+    const name=(m?m[1]:line).trim()||line;
+    return {name,female:!!m&&m[2].toLowerCase()!=="nam"};
+  });
+}
 function showSetup(){
-  state="setup"; $("#mainBtn").disabled=true; card.scrollTop=0;
-  const saved=loadNames()||SAMPLE_NAMES.join("\n");
+  state="setup"; $("#mainBtn").disabled=true; card.scrollTop=0; clearBubbles();
+  const saved=loadNames()||SAMPLE_NAMES;
   card.className="card pop";
   card.innerHTML=`
     <div class="tag">◉ CẢNH BÁO: PHÁT HIỆN VẬT THỂ LẠ</div>
@@ -306,6 +551,7 @@ function showSetup(){
       <div>
         <label>Danh sách lớp (mỗi dòng một tên)</label>
         <textarea id="names" spellcheck="false">${esc(saved)}</textarea>
+        <div class="note">Bạn nữ thì ghi thêm <b>(nữ)</b> sau tên, ví dụ: <b>Châu (nữ)</b>. Không ghi thì vẽ là nam.</div>
         <label>Thời gian mỗi câu (giây)</label>
         <input type="number" id="secs" min="5" max="120" value="${tTotal}">
         <label>Bộ câu hỏi</label>
@@ -316,9 +562,10 @@ function showSetup(){
       <div class="rules">
         <label>Luật chơi</label>
         UFO bay ngẫu nhiên, <b>hút trúng ai thì người đó chọn đáp án</b> cho câu hỏi trắc nghiệm của người ngoài hành tinh.<br>
+        Cẩn thận: UFO hay giở trò, <b>đang tưởng an toàn có khi lại tới lượt mình</b>!<br>
         Đúng: <b>an toàn + nhận kẹo</b>.<br>
         Sai hoặc hết giờ: <b>bị bắt lên UFO</b>.<br>
-        Hết ${QUESTIONS.length} câu: <b>hơn 50% đúng</b> thì UFO chán nản bỏ đi, ngược lại UFO thống trị Trái Đất.
+        Hết ${QUESTIONS.length} câu: <b>hơn 50% đúng</b> thì Trái Đất thắng, ngược lại UFO thắng.
         <label>Phím tắt cho người điều khiển</label>
         <kbd>Space</kbd> UFO săn / tiếp tục<br>
         <kbd>A</kbd>–<kbd>D</kbd> hoặc <kbd>1</kbd>–<kbd>4</kbd> chọn đáp án<br>
@@ -333,27 +580,37 @@ function readSetup(){
   if(n)saveNames(n.value);
   if(s)tTotal=Math.max(5,Math.min(120,parseInt(s.value)||20));
 }
+/* Bốc thăm khoảng 1/3 số câu có sự cố: "pre" = twist lúc chọn người, "post" = sự cố sau khi chấm */
+function makePlan(n){
+  const k=Math.max(1,Math.round(n/3)), pl=Array(n).fill(null);
+  shuffle([...Array(n).keys()]).slice(0,k).forEach((i,j)=>pl[i]=(j===0||Math.random()<.6)?"pre":"post");
+  return pl;
+}
 function startGame(){
   actx();
-  const raw=$("#names").value; const names=raw.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
-  if(!names.length){$("#err").textContent="Nhập ít nhất một tên nhé.";return}
+  const list=parseNames($("#names").value);
+  if(!list.length){$("#err").textContent="Nhập ít nhất một tên nhé.";return}
   readSetup();
-  buildCrowd(names);
-  qi=0;right=0;wrong=0;updateScore();
+  buildCrowd(list);
+  qi=0;right=0;wrong=0;hintStep=0;updateScore();
+  plan=makePlan(QUESTIONS.length); twistDeck=[];
   stage.classList.remove("doom"); document.querySelectorAll(".ufo-extra").forEach(e=>e.remove());
-  ufo.style.display="";ufo.classList.remove("angry");
+  fam.classList.remove("show"); fam.innerHTML=""; clearCaptives(); peekBaby(false); setAlien("smirk");
+  ufo.style.display="";ufo.style.opacity="";
   overlay.classList.remove("show"); cap.innerHTML="";
   homeUfo(); toIdle();
 }
-function buildCrowd(names){
+function buildCrowd(list){
   crowd.innerHTML=""; people=[];
-  const n=names.length, s=n<=16?1:n<=26?.86:n<=36?.74:n<=48?.64:.56;
+  const n=list.length, s=n<=14?1:n<=24?.86:n<=34?.74:n<=46?.64:.56;
   document.documentElement.style.setProperty("--s",s);
-  names.forEach((nm,i)=>{
-    const el=document.createElement("div"); el.className="p"; el.style.setProperty("--c",COLORS[i%COLORS.length]);
-    el.innerHTML=`<div class="fig"><div class="head"></div><div class="body"></div></div><div class="nm" title="${esc(nm)}">${esc(nm)}</div><div class="lbl">đã lên UFO</div>`;
+  list.forEach(it=>{
+    const L=looks(it.name,it.female), el=document.createElement("div");
+    el.className="p"; el.style.setProperty("--bd",(Math.random()*4.5).toFixed(2)+"s"); el.style.setProperty("--hd",(Math.random()*.3).toFixed(2)+"s");
+    el.innerHTML=`<div class="mover"><div class="jump">${figSVG(L)}</div><div class="nm" title="${esc(it.name)}">${esc(it.name)}</div><div class="lbl">đã lên UFO</div></div>`;
     crowd.appendChild(el);
-    people.push({name:nm,el,fig:el.querySelector(".fig"),gone:false,picked:false,absent:false});
+    people.push({name:it.name,L,el,mover:el.querySelector(".mover"),jump:el.querySelector(".jump"),fig:el.querySelector(".fig"),faceEl:el.querySelector(".face"),
+      face:"happy",dx:0,tok:0,busy:false,gone:false,picked:false,absent:false});
   });
 }
 function updateScore(){
@@ -361,27 +618,114 @@ function updateScore(){
   $("#sRight").textContent=right; $("#sWrong").textContent=wrong;
 }
 
+/* ============ điều khiển nhân vật ============ */
+function setFace(p,f){if(p.face===f)return;p.face=f;p.faceEl.innerHTML=FACES[f]}
+function setPose(p,c){p.el.classList.remove("wave","cheer","cover");if(c)p.el.classList.add(c)}
+function homeX(p){const r=p.el.getBoundingClientRect();return r.left+r.width/2}
+function moveTo(p,dx,run=true){
+  const old=p.dx; p.dx=dx; p.mover.style.transform=dx?`translateX(${dx}px)`:"";
+  if(run&&Math.abs(dx-old)>4){
+    p.fig.classList.toggle("flip",dx<old); p.el.classList.add("run"); clearTimeout(p.rt);
+    p.rt=setTimeout(()=>{p.el.classList.remove("run");p.fig.classList.remove("flip")},560);
+  }
+}
+function claim(p){p.tok++;p.busy=true;return p.tok}
+function release(p,t,face="happy"){if(p.tok!==t)return;p.busy=false;setFace(p,face);setPose(p,"");p.el.classList.remove("tremble","bounce","tilt","hop")}
+function resetCrowd(){
+  people.forEach(p=>{p.tok++;p.busy=false;setFace(p,"happy");setPose(p,"");p.el.classList.remove("bounce","tremble","hop","tilt","target");if(p.dx)moveTo(p,0)});
+}
+function crowdCheer(ms=2400){
+  people.forEach(p=>{if(p.gone)return;const t=claim(p);setFace(p,"cheer");setPose(p,Math.random()<.6?"cheer":"wave");p.el.classList.add("bounce");setTimeout(()=>release(p,t),ms)});
+}
+function crowdSad(except,ms=3000){
+  people.forEach(p=>{if(p.gone||p===except)return;const t=claim(p);setFace(p,Math.random()<.5?"sad":"scared");setPose(p,Math.random()<.5?"wave":"cover");setTimeout(()=>release(p,t),ms)});
+}
+/* Người ở gần UFO thì bỏ chạy, UFO đi xa thì quay về */
+function reactToUfo(cx,except){
+  people.forEach(p=>{
+    if(p.gone||p===except)return;
+    const hx=homeX(p), d=hx-cx;
+    if(Math.abs(d)<170){
+      claim(p); const dir=d>=0?1:-1;
+      const dx=Math.max(24-hx,Math.min(innerWidth-24-hx,dir*(100+Math.random()*70)));
+      moveTo(p,dx); setFace(p,Math.random()<.5?"scared":"panic"); setPose(p,Math.random()<.4?"cover":"");
+      p.el.classList.remove("tremble");
+    }else if(p.busy&&p.dx){
+      moveTo(p,0); setFace(p,"scared"); setPose(p,""); p.el.classList.add("tremble");
+    }
+  });
+}
+function calmCrowd(t){
+  people.forEach(p=>{if(p.gone||p===t)return;const k=claim(p);if(p.dx)moveTo(p,0);setFace(p,"relieved");setPose(p,"");p.el.classList.remove("tremble");setTimeout(()=>release(p,k),1800)});
+}
+function neighbor(t){
+  const r=t.fig.getBoundingClientRect();let best=null,bd=1e9;
+  people.forEach(p=>{if(p===t||p.gone||p.absent)return;const q=p.el.getBoundingClientRect(),d=Math.hypot(q.left-r.left,(q.top-r.top)*1.6);if(d<bd){bd=d;best=p}});
+  return best;
+}
+/* Hoạt động lúc chờ: nhún, vẫy tay, nghiêng đầu, ngó nghiêng */
+setInterval(()=>{
+  if(!people.length||document.hidden||state==="setup"||state==="edit")return;
+  if(state==="question"&&Math.random()<.5)return;
+  const free=people.filter(p=>!p.gone&&!p.busy&&p!==current&&p.face==="happy");
+  if(!free.length)return;
+  const p=pick(free), t=claim(p), act=pick(["hop","wave","tilt","look","hop","wave","cheer"]);
+  if(act==="hop"){p.el.classList.add("hop");setTimeout(()=>release(p,t),480)}
+  else if(act==="wave"){setPose(p,"wave");setFace(p,"cheer");setTimeout(()=>release(p,t),1400)}
+  else if(act==="cheer"){setPose(p,"cheer");p.el.classList.add("hop");setFace(p,"cheer");setTimeout(()=>release(p,t),700)}
+  else if(act==="tilt"){p.el.classList.add("tilt");setTimeout(()=>release(p,t),1100)}
+  else {p.fig.classList.add("flip");setTimeout(()=>{p.fig.classList.remove("flip");release(p,t)},900)}
+},550);
+
+/* ============ bong bóng thoại ============ */
+function clearBubbles(){document.querySelectorAll(".bubble").forEach(b=>b.remove())}
+function bubble(rect,text,cls=""){
+  const b=document.createElement("div"); b.className="bubble "+cls; b.textContent=text; document.body.appendChild(b);
+  const w=b.offsetWidth,h=b.offsetHeight,x=rect.left+rect.width/2, left=Math.max(8,Math.min(innerWidth-w-8,x-w/2));
+  let y=rect.top-h-14; if(y<72){y=rect.bottom+14;b.classList.add("down")}
+  b.style.left=left+"px"; b.style.top=y+"px"; b.style.setProperty("--tx",Math.max(18,Math.min(w-18,x-left))+"px");
+  return b;
+}
+async function say(el,text,cls="",ms){
+  const b=bubble(el.getBoundingClientRect(),text,cls);
+  await wait(ms||Math.min(4600,1300+text.length*48)); b.remove();
+}
+const sayUfo=(t,cls="",ms)=>say(dome,t,cls,ms);
+async function playHint(){
+  const h=FAMILY_HINTS[hintStep]; if(!h)return; hintStep++;
+  await wait(500);
+  for(const s of h){
+    if(state!=="idle")break;
+    if(s.w==="baby")peekBaby(true); if(s.e)setAlien(s.e);
+    await sayUfo(s.t,s.w==="pilot"?"":s.w);
+  }
+  peekBaby(false); if(state==="idle")setAlien("smirk");
+}
+
 /* ============ UFO di chuyển ============ */
 function setUfo(x,y,ms){ufo.style.transitionDuration=ms+"ms";ufoX=x;ufoY=y;ufo.style.left=x+"px";ufo.style.top=y+"px"}
-function homeUfo(ms=700){setUfo(innerWidth/2-110,90,ms)}
+function homeUfo(ms=700){setUfo(innerWidth/2-130,80,ms)}
 function posFor(p){
   const r=p.fig.getBoundingClientRect(), cx=r.left+r.width/2;
-  const x=Math.max(8,Math.min(innerWidth-228,cx-110));
-  const y=Math.max(78,r.top-250);
-  return {x,y,cx,r};
+  return {x:Math.max(8,Math.min(innerWidth-268,cx-130)),y:Math.max(76,r.top-260),cx,r};
 }
-async function flyTo(p,ms){
-  document.querySelectorAll(".p.scan").forEach(e=>e.classList.remove("scan"));
-  const {x,y}=posFor(p); setUfo(x,y,ms); sfx.hum();
-  await wait(ms*.75); p.el.classList.add("scan"); await wait(ms*.25+60);
+async function flyTo(p,ms,except){
+  const {x,y,cx}=posFor(p); setUfo(x,y,ms); sfx.hum();
+  setTimeout(()=>reactToUfo(cx,except),ms*.35);
+  await wait(ms+60);
 }
-function beamOn(p,red=false){
-  const {cx,r}=posFor(p); const top=ufoY+92;
+function beamOn(p,cls=""){
+  const {cx,r}=posFor(p), top=ufoY+104;
   beam.style.left=(cx-95)+"px"; beam.style.top=top+"px"; beam.style.height=Math.max(40,r.bottom-top+6)+"px";
-  beam.classList.toggle("red",red); beam.classList.add("on");
+  beam.classList.remove("red","gold"); if(cls)beam.classList.add(cls); beam.classList.add("on");
 }
-function beamOff(){beam.classList.remove("on","red")}
-function ufoCenter(){const r=ufo.getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height*.6}}
+function beamOff(){beam.classList.remove("on","red","gold")}
+function ufoCenter(){const r=ufo.getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height*.45}}
+function addCaptive(p){
+  const L=document.querySelector(".capL"),R=document.querySelector(".capR"), box=L.children.length<=R.children.length?L:R;
+  const d=document.createElement("div"); d.className="cap"; d.innerHTML=figSVG(p.L,"panic"); box.appendChild(d);
+}
+function clearCaptives(){document.querySelectorAll(".capL,.capR").forEach(b=>b.innerHTML="")}
 
 /* ============ vòng chơi ============ */
 function toIdle(){state="idle";$("#mainBtn").disabled=false;updateScore()}
@@ -391,18 +735,76 @@ function candidates(){
   if(!c.length)c=people.filter(p=>!p.absent);
   return c.length?c:people;
 }
-async function hunt(){
-  if(state!=="idle")return; state="hunting"; $("#mainBtn").disabled=true; cap.innerHTML="";
-  const target=pick(candidates());
-  const visible=people.filter(p=>!p.gone&&!p.absent);
-  const hops=5+Math.floor(Math.random()*3);
-  for(let i=0;i<hops;i++){await flyTo(pick(visible.length?visible:people),360+i*40)}
-  await flyTo(target,700);
-  document.querySelectorAll(".p.scan").forEach(e=>e.classList.remove("scan"));
-  target.el.classList.add("target"); sfx.lock(); beamOn(target);
-  await wait(800);
-  current=target; showQuestion();
+function lock(t){
+  claim(t); if(t.dx)moveTo(t,0,false);
+  t.el.classList.add("target","tremble"); setFace(t,"panic"); setPose(t,"cover");
+  sfx.lock(); beamOn(t); calmCrowd(t);
 }
+async function hunt(){
+  if(state!=="idle")return; state="hunting"; $("#mainBtn").disabled=true; cap.innerHTML=""; clearBubbles(); peekBaby(false);
+  resetCrowd(); setAlien("evil");
+  let target=pick(candidates());
+  const visible=()=>people.filter(p=>!p.gone&&!p.absent);
+  const hops=4+Math.floor(Math.random()*3);
+  for(let i=0;i<hops;i++){await flyTo(pick(visible().length?visible():people),380+i*45)}
+  claim(target); if(target.dx)moveTo(target,0);
+  await flyTo(target,700,target);
+  lock(target);
+  await wait(900);
+  if(plan[qi]==="pre"&&visible().length>1){
+    if(!twistDeck.length)twistDeck=shuffle(["struggle","dodge","fakeout","struggle","dodge"]);
+    const kind=twistDeck.pop();
+    target=await (kind==="struggle"?twistStruggle:kind==="dodge"?twistDodge:twistFakeout)(target);
+  }
+  setAlien("smirk");
+  current=target; await wait(400); cap.innerHTML=""; showQuestion();
+}
+
+/* ---- twist lúc chọn người: tưởng an toàn mà hóa ra tới lượt mình ---- */
+async function twistStruggle(t){
+  const n=neighbor(t); if(!n)return t;
+  caption("VÙNG VẰNG!",`${t.name} giãy giụa trong tia hút…`,"var(--lime)");
+  t.el.classList.remove("tremble"); setPose(t,"cheer");
+  await t.jump.animate([{transform:"translateY(0)"},{transform:"translateY(-48px) rotate(-16deg)",offset:.25},{transform:"translateY(-56px) rotate(18deg)",offset:.42},{transform:"translateY(-50px) rotate(-20deg)",offset:.58},{transform:"translateY(-58px) rotate(16deg)",offset:.74},{transform:"translateY(0) rotate(0)"}],{duration:2000,easing:"ease-in-out"}).finished;
+  sfx.thud(); beamOff(); setAlien("angry"); setFace(t,"dizzy"); setPose(t,""); t.el.classList.remove("target");
+  sayUfo("Hừ! Vậy bắt luôn đứa bên cạnh!","",2200);
+  await wait(700);
+  caption("…ỦA?",`UFO quay sang chộp luôn ${n.name}!`,"var(--bad)");
+  setFace(n,"surprised"); await wait(500);
+  claim(n); await flyTo(n,420,n); lock(n);
+  setTimeout(()=>{const k=claim(t);setFace(t,"relieved");setTimeout(()=>release(t,k),1500)},700);
+  await wait(1500); return n;
+}
+async function twistDodge(t){
+  const n=neighbor(t); if(!n)return t;
+  const dir=homeX(t)>=homeX(n)?1:-1, hx=homeX(t);
+  const dx=Math.max(24-hx,Math.min(innerWidth-24-hx,dir*90));
+  sfx.boing(); beamOff(); t.el.classList.remove("tremble","target"); setFace(t,"surprised"); setPose(t,"cheer");
+  moveTo(t,dx); t.el.classList.add("hop");
+  caption("NÉ ĐẸP!",`${t.name} nhảy né tia hút trong gang tấc…`,"var(--lime)");
+  await wait(900); t.el.classList.remove("hop"); setFace(t,"relieved"); setPose(t,"");
+  setAlien("shock"); await wait(300);
+  caption("…TRÚNG NGƯỜI KHÁC!",`Tia hút chụp trúng ${n.name} đứng ngay bên cạnh!`,"var(--bad)");
+  claim(n); await flyTo(n,320,n); lock(n);
+  const k=claim(t); setTimeout(()=>{moveTo(t,0);release(t,k)},1600);
+  await wait(1500); return n;
+}
+async function twistFakeout(t){
+  const tx=homeX(t), pool=candidates().filter(p=>p!==t&&!p.gone&&!p.absent);
+  if(!pool.length)return t;
+  pool.sort((a,b)=>Math.abs(homeX(b)-tx)-Math.abs(homeX(a)-tx));
+  const far=pick(pool.slice(0,Math.max(1,Math.ceil(pool.length/3))));
+  setAlien("shock"); await sayUfo("Ơ… khoan, nhầm người!","",1500);
+  beamOff(); t.el.classList.remove("tremble","target"); setFace(t,"relieved"); setPose(t,"");
+  people.forEach(p=>{if(p!==t&&!p.gone){const k=claim(p);setFace(p,"cheer");setPose(p,"cheer");p.el.classList.add("bounce");setTimeout(()=>{if(p.tok===k)p.el.classList.remove("bounce")},1200)}});
+  caption("QUAY XE!",`UFO đổi ý, lao thẳng về phía ${far.name}!`,"var(--bad)");
+  await wait(700); setAlien("evil");
+  setFace(far,"surprised"); far.el.classList.remove("bounce");
+  claim(far); await flyTo(far,650,far); lock(far);
+  const k=claim(t); setTimeout(()=>release(t,k),1500);
+  await wait(1500); return far;
+}
+
 async function showQuestion(){
   state="question"; hintShown=false; paused=false;
   const q=QUESTIONS[qi];
@@ -420,7 +822,6 @@ async function showQuestion(){
       <button class="btn ghost" onclick="reroll()">Vắng, chọn lại <small>(R)</small></button>
     </div>`;
   overlay.classList.add("show");
-  // hiệu ứng gõ chữ
   const el=$("#qtext"), txt=q.q, step=Math.max(1,Math.round(txt.length/45));
   for(let i=0;i<=txt.length;i+=step){ if(state!=="question")return; el.textContent=txt.slice(0,i); if(i%(step*3)===0)sfx.blip(); await wait(22); }
   el.textContent=txt;
@@ -457,38 +858,115 @@ function togglePause(){if(state!=="question")return;paused=!paused;const b=$("#p
 async function reroll(){
   if(state!=="question")return;
   clearInterval(timerId); overlay.classList.remove("show"); beamOff();
-  current.el.classList.remove("target"); current.absent=true; current.el.classList.add("absent");
-  state="idle"; await wait(200); hunt();
+  current.el.classList.remove("target","tremble"); current.absent=true; current.el.classList.add("absent");
+  current=null; state="idle"; await wait(200); hunt();
 }
 async function judge(ok,timeout=false){
   if(state!=="reveal")return; state="cutscene"; clearInterval(timerId);
   overlay.classList.remove("show");
-  const p=current; p.picked=true;
+  const p=current; p.picked=true; p.el.classList.remove("tremble");
+  const event=plan[qi]==="post";
   if(ok){
     right++; updateScore(); sfx.ok();
-    beam.classList.remove("on"); p.el.classList.remove("target"); p.el.classList.add("safe");
+    beamOff(); p.el.classList.remove("target"); p.el.classList.add("safe");
+    crowdCheer(); setAlien("angry");
     ufo.firstElementChild.classList.add("shake"); setTimeout(()=>ufo.firstElementChild.classList.remove("shake"),800);
     confetti(p);
     caption("CHÍNH XÁC!",pick(SAFE_LINES).replace("{n}",p.name),"var(--ok)");
     await wait(2300);
+    if(event)await eventShots();
   }else{
-    wrong++; updateScore(); sfx.buzz(); ufo.classList.add("angry");
+    wrong++; updateScore(); sfx.buzz(); setAlien("laugh"); setFace(p,"panic");
     caption(timeout?"HẾT GIỜ!":"SAI RỒI!","","var(--bad)");
     await wait(1000);
-    beamOn(p,true); sfx.zap(); await abduct(p);
-    sfx.gulp(); ufo.animate([{transform:"scale(1)"},{transform:"scale(1.18,.86)"},{transform:"scale(1)"}],{duration:450});
-    caption("BỊ BẮT CÓC!",pick(ABDUCT_LINES).replace("{n}",p.name),"var(--bad)");
-    beamOff(); ufo.classList.remove("angry");
-    await wait(2600);
+    let ev=event?pick(["rescue","glitch"]):null;
+    if(ev==="rescue"&&!neighbor(p))ev="glitch";
+    if(ev==="rescue")await eventRescue(p);
+    else if(ev==="glitch")await eventGlitch(p);
+    else await normalAbduct(p);
   }
-  showAnswer();
+  setAlien("smirk"); showAnswer();
+}
+function gulp(){sfx.gulp();ufo.animate([{transform:"scale(1)"},{transform:"scale(1.15,.88)"},{transform:"scale(1)"}],{duration:450})}
+async function normalAbduct(p){
+  beamOn(p,"red"); sfx.zap(); crowdSad(p);
+  await abduct(p); gulp();
+  caption("BỊ BẮT CÓC!",pick(ABDUCT_LINES).replace("{n}",p.name),"var(--bad)");
+  beamOff(); await wait(2600);
+}
+/* ---- sự cố sau khi chấm (chỉ là hiệu ứng, điểm vẫn tính theo câu trả lời) ---- */
+async function eventRescue(p){
+  const f=neighbor(p); const ft=claim(f);
+  beamOn(p,"red"); sfx.zap(); setPose(p,"cheer");
+  const lift=p.jump.animate([{transform:"translateY(0)"},{transform:"translateY(-36px)"}],{duration:700,fill:"forwards"});
+  caption("KHOAN ĐÃ!",`${f.name} lao tới cứu ${p.name}!`,"var(--lime)");
+  const side=homeX(f)<homeX(p)?-1:1;
+  moveTo(f,homeX(p)-homeX(f)+side*26); setFace(f,"panic");
+  await wait(650);
+  setPose(f,"cheer"); f.el.classList.add("tremble"); setFace(f,"scared");
+  for(let i=0;i<5;i++){sfx.tick();await wait(300)}
+  if(Math.random()<.5){
+    beamOff(); sfx.boing(); lift.cancel();
+    p.jump.animate([{transform:"translateY(-36px)"},{transform:"translateY(0)"}],{duration:300,easing:"ease-in"});
+    f.el.classList.remove("tremble"); setAlien("angry");
+    caption("BẠN THÂN CỨU NGUY!",`${f.name} kéo ${p.name} xuống kịp! (UFO vẫn được 1 điểm)`,"var(--ok)");
+    crowdCheer(2400); await wait(2600); moveTo(f,0);
+  }else{
+    f.el.classList.remove("tremble"); setFace(f,"panic"); crowdSad();
+    caption("BỊ HÚT CẢ HAI!",`${p.name} và ${f.name} cùng bay lên UFO!`,"var(--bad)");
+    await Promise.all([abduct(p),wait(250).then(()=>abduct(f))]); lift.cancel(); gulp();
+    beamOff(); await wait(2400);
+  }
+  release(f,f.tok);
+}
+async function eventGlitch(p){
+  beamOn(p,"red"); sfx.zap(); crowdSad(p); setPose(p,"cheer");
+  const lift=p.jump.animate([{transform:"translateY(0)"},{transform:"translateY(-70px) rotate(-10deg)",offset:.5},{transform:"translateY(-110px) rotate(10deg)"}],{duration:1500,fill:"forwards"});
+  await wait(1300);
+  peekBaby(true); sfx.glitch();
+  for(let i=0;i<7;i++){beam.classList.toggle("on");await wait(90)}
+  beamOff(); lift.cancel(); setPose(p,"");
+  await p.jump.animate([{transform:"translateY(-110px)"},{transform:"translateY(0)",offset:.7},{transform:"translateY(-14px)",offset:.85},{transform:"translateY(0)"}],{duration:650,easing:"ease-in"}).finished;
+  sfx.thud(); setFace(p,"dizzy");
+  caption("UFO TRỤC TRẶC!",`${p.name} rơi bịch xuống đất, thoát nạn! (UFO vẫn được 1 điểm)`,"var(--lime)");
+  setAlien("angry"); await sayUfo("Bé! Đã bảo đừng nghịch nút mà!","",2000);
+  await sayUfo("Con xin lỗi bố ạ…","baby",1700);
+  peekBaby(false); const t=claim(p); setTimeout(()=>release(p,t),800); await wait(500);
+}
+function zapLine(x1,y1,x2,y2){
+  const z=document.createElement("div"); z.className="zap";
+  z.style.left=x1+"px"; z.style.top=y1+"px"; z.style.width=Math.hypot(x2-x1,y2-y1)+"px";
+  z.style.transform=`rotate(${Math.atan2(y2-y1,x2-x1)}rad)`; document.body.appendChild(z);
+  z.animate([{opacity:1},{opacity:0}],{duration:320}).finished.then(()=>z.remove());
+}
+async function eventShots(){
+  setAlien("angry"); sayUfo("Tức quá! Bắn hết!","",1600);
+  caption("UFO CAY CÚ!","Bắn tia loạn xạ, cả lớp nhảy né!","var(--bad)");
+  const pool=people.filter(x=>!x.gone&&!x.absent); if(!pool.length)return;
+  for(let i=0;i<6;i++){
+    const v=pick(pool), r=v.fig.getBoundingClientRect(), u=ufoCenter(), k=claim(v);
+    zapLine(u.x,u.y+40,r.left+r.width/2+(Math.random()*60-30),r.bottom-6); sfx.pew();
+    setFace(v,"surprised"); setPose(v,"cheer"); v.el.classList.add("hop");
+    setTimeout(()=>{v.el.classList.remove("hop");release(v,k)},900);
+    await wait(330);
+  }
+  if(Math.random()<.65){
+    const v=pick(pool), r=v.fig.getBoundingClientRect(), u=ufoCenter(), k=claim(v);
+    zapLine(u.x,u.y+40,r.left+r.width/2,r.top+10); sfx.pew(); sfx.thud();
+    v.el.classList.add("burnt"); setFace(v,"dizzy");
+    for(let i=0;i<5;i++)setTimeout(()=>puffAt(r.left+r.width/2+(Math.random()*30-15),r.top+10),i*120);
+    caption("CHÁY TÓC!",`${v.name} né chậm, tóc cháy xém!`,"var(--lime)");
+    setTimeout(()=>release(v,k),2200);
+  }
+  await wait(1900);
 }
 async function abduct(p){
   const r=p.fig.getBoundingClientRect(), clone=p.fig.cloneNode(true);
-  const s=getComputedStyle(document.documentElement).getPropertyValue("--s");
-  clone.style.cssText=`position:fixed;left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;z-index:9;--s:${s};--c:${p.el.style.getPropertyValue("--c")}`;
+  clone.classList.remove("flip");
+  clone.style.cssText=`position:fixed;left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;z-index:9`;
   document.body.appendChild(clone);
-  p.gone=true; p.el.classList.remove("target"); p.el.classList.add("gone");
+  p.jump.getAnimations().forEach(a=>a.cancel());
+  p.gone=true; p.el.classList.remove("target","tremble","run","safe"); p.el.classList.add("gone"); moveTo(p,0,false);
   const u=ufoCenter(), dx=u.x-(r.left+r.width/2), dy=u.y-(r.top+r.height/2);
   const a=clone.animate([
     {transform:"translate(0,0) rotate(0) scale(1)"},
@@ -496,7 +974,7 @@ async function abduct(p){
     {transform:"translate(10px,-30px) rotate(25deg) scale(1.1)",offset:.24},
     {transform:`translate(${dx}px,${dy}px) rotate(900deg) scale(.05)`,opacity:.2}
   ],{duration:1700,easing:"cubic-bezier(.55,0,.85,.5)"});
-  await a.finished; clone.remove();
+  await a.finished; clone.remove(); addCaptive(p);
 }
 function caption(title,line,color){
   cap.innerHTML=`<h1 class="pop" style="color:${color}">${esc(title)}</h1>${line?`<p class="pop">${esc(line)}</p>`:""}`;
@@ -526,50 +1004,101 @@ function showAnswer(){
 async function nextQ(){
   if(state!=="answer")return;
   overlay.classList.remove("show"); beamOff();
-  people.forEach(p=>p.el.classList.remove("target"));
-  qi++;
+  people.forEach(p=>p.el.classList.remove("target","safe"));
+  current=null; qi++;
   if(qi>=QUESTIONS.length){await ending();return}
-  homeUfo(); updateScore(); toIdle();
+  homeUfo(); updateScore(); toIdle(); resetCrowd(); playHint();
 }
 
-/* ============ kết cục ============ */
+/* ============ kết cục + plot twist: UFO là một gia đình đi lạc ============ */
+const TWIST_WIN=[
+  ["dad","Khoan! Đừng sợ… chúng tôi không phải kẻ xâm lăng."],
+  ["mom","Thật ra nhà chúng tôi đi lạc. Ở hành tinh mình, cả nhà cứ cãi nhau suốt…"],
+  ["baby","Nên bố mẹ con đi tìm bí quyết xây dựng gia đình hạnh phúc ạ!"],
+  ["dad","Chia sẻ việc nhà, tôn trọng, yêu thương nhau… Nhà mình học xong rồi. Cảm ơn các bạn!"],
+  ["mom","Trả lại các bạn đây. Tạm biệt Trái Đất!"],
+];
+const TWIST_LOSE=[
+  ["dad","Khoan… thật ra chúng tôi không phải kẻ xâm lăng."],
+  ["mom","Nhà chúng tôi đi lạc, đang đi tìm cách xây dựng gia đình hạnh phúc…"],
+  ["baby","Mà các anh chị cũng chưa thuộc bài luôn!"],
+  ["dad","Thôi, cả lớp lên tàu ôn bài chung với nhà mình nhé!"],
+];
+function puffAt(x,y){
+  const d=document.createElement("div"), sz=16+Math.random()*24;
+  d.className="puff"; d.style.cssText+=`width:${sz}px;height:${sz}px;left:${x-sz/2}px;top:${y}px;position:fixed`;
+  document.body.appendChild(d);
+  d.animate([{transform:"translateY(0) scale(.5)",opacity:.9},{transform:`translateY(-${60+Math.random()*80}px) scale(1.8)`,opacity:0}],{duration:1200}).finished.then(()=>d.remove());
+}
+function puff(){const u=ufoCenter();puffAt(u.x+(Math.random()*120-60),u.y)}
+function hearts(n=14){
+  const r=fam.getBoundingClientRect();
+  for(let i=0;i<n;i++){
+    const h=document.createElement("div"); h.className="heart"; h.textContent="♥";
+    h.style.left=(r.left+Math.random()*r.width)+"px"; h.style.top=(r.top+Math.random()*40)+"px"; document.body.appendChild(h);
+    h.animate([{transform:"translateY(0) scale(.6)",opacity:1},{transform:`translate(${Math.random()*80-40}px,-${120+Math.random()*120}px) scale(1.3)`,opacity:0}],{duration:1600+Math.random()*800,delay:i*90}).finished.then(()=>h.remove());
+  }
+}
+async function revealFamily(lines){
+  sfx.twist(); caption("PLOT TWIST?!","","var(--lime)"); await wait(1600); cap.innerHTML="";
+  setAlien("sad"); peekBaby(true);
+  setUfo(innerWidth/2-130,Math.max(70,innerHeight*.12),1200); await wait(1300);
+  const famTop=Math.max(ufoY+150,innerHeight*.4);
+  beam.style.left=(innerWidth/2-95)+"px"; beam.style.top=(ufoY+104)+"px"; beam.style.height=(famTop+110-ufoY-104)+"px";
+  beam.classList.add("gold","on");
+  fam.style.top=famTop+"px";
+  fam.innerHTML=`<div class="fam" data-k="dad" style="width:96px;height:132px">${famSVG("dad")}</div><div class="fam" data-k="baby" style="width:62px;height:85px">${famSVG("baby")}</div><div class="fam" data-k="mom" style="width:92px;height:126px">${famSVG("mom")}</div>`;
+  fam.classList.add("show"); peekBaby(false);
+  [...fam.children].forEach((f,i)=>f.animate([{transform:"translateY(-140px) scale(.2)",opacity:0},{transform:"none",opacity:1}],{duration:900,delay:i*200,easing:"cubic-bezier(.3,1.3,.5,1)"}));
+  await wait(1400);
+  for(const [k,t] of lines){await say(fam.querySelector(`[data-k="${k}"]`),t,k==="baby"?"baby":"")}
+}
 async function ending(){
-  state="end"; $("#mainBtn").disabled=true; updateScore();
+  state="end"; $("#mainBtn").disabled=true; updateScore(); resetCrowd(); clearBubbles(); peekBaby(false);
   const total=QUESTIONS.length, win=right*2>total;
   homeUfo(900); await wait(1000);
   if(win){
-    caption("…","UFO: “Loài người hiểu bài quá… chán thật.”","var(--lime)");
+    setAlien("shock"); caption("…","UFO: “Loài người hiểu bài quá…”","var(--lime)");
     ufo.firstElementChild.classList.add("shake");
-    for(let i=0;i<14;i++){puff();await wait(140)}
-    ufo.firstElementChild.classList.remove("shake");
+    for(let i=0;i<10;i++){puff();await wait(140)}
+    ufo.firstElementChild.classList.remove("shake"); await wait(600);
+    await revealFamily(TWIST_WIN);
     // thả những người bị bắt về
+    clearCaptives();
     people.filter(p=>p.gone).forEach((p,i)=>{
       p.gone=false;p.el.classList.remove("gone");
       p.fig.animate([{transform:"translateY(-60vh) scale(.2)",opacity:0},{transform:"translateY(0) scale(1)",opacity:1}],{duration:900,delay:i*120,easing:"cubic-bezier(.3,1.4,.5,1)"});
     });
+    setAlien("love"); hearts(); await wait(900); crowdCheer(4000); sfx.win();
     await wait(1200);
+    [...fam.children].forEach((f,i)=>f.animate([{transform:"none",opacity:1},{transform:"translateY(-160px) scale(.2)",opacity:0}],{duration:700,delay:i*150,fill:"forwards"}));
+    await wait(1000); fam.classList.remove("show"); beamOff();
     await ufo.animate([{transform:"translate(0,0) scale(1)"},{transform:"translate(-30px,20px) scale(1.05)",offset:.2},{transform:`translate(${innerWidth*.6}px,-${innerHeight*.5}px) scale(.08)`,opacity:.2}],{duration:1900,easing:"cubic-bezier(.6,0,.9,.6)"}).finished;
-    ufo.style.display="none"; sfx.win(); cap.innerHTML="";
-    endCard("TRÁI ĐẤT AN TOÀN!",`Đúng ${right}/${total} câu. UFO chán nản bỏ đi vì loài người hiểu bài quá. Ai bị bắt đã được thả về!`,"var(--ok)");
+    ufo.style.display="none"; cap.innerHTML="";
+    endCard("TRÁI ĐẤT AN TOÀN!",`Đúng ${right}/${total} câu. Plot twist: UFO hóa ra là một gia đình đi lạc, tới Trái Đất để học cách xây dựng gia đình hạnh phúc. Ai bị bắt đã được thả về!`,"var(--ok)");
   }else{
-    ufo.classList.add("angry"); caption("HA HA HA!","UFO: “Trái Đất là của chúng ta!”","var(--bad)");
+    setAlien("laugh"); caption("HA HA HA!","UFO: “Trái Đất là của chúng ta!”","var(--bad)");
     stage.classList.add("doom"); sfx.lose();
+    people.forEach(p=>{if(p.gone)return;claim(p);setFace(p,"panic");setPose(p,"cover");const hx=homeX(p);moveTo(p,Math.max(24-hx,Math.min(innerWidth-24-hx,(Math.random()*2-1)*140)))});
     for(let i=0;i<6;i++){
-      const c=ufo.cloneNode(true); c.removeAttribute("id"); c.className="ufo-extra angry";
-      c.style.cssText=`position:absolute;width:220px;height:110px;z-index:9;left:${Math.random()*(innerWidth-220)}px;top:${80+Math.random()*innerHeight*.28}px;transform:scale(${.4+Math.random()*.4})`;
+      const c=ufo.cloneNode(true); c.removeAttribute("id"); c.querySelectorAll("[id]").forEach(e=>e.removeAttribute("id"));
+      c.querySelectorAll(".capL,.capR").forEach(e=>e.innerHTML=""); c.className="ufo-extra";
+      c.style.cssText=`left:${Math.random()*(innerWidth-260)}px;top:${80+Math.random()*innerHeight*.25}px;transform:scale(${(.4+Math.random()*.4).toFixed(2)})`;
       stage.appendChild(c);
-      c.animate([{transform:`translateY(-60vh) scale(.3)`,opacity:0},{transform:c.style.transform,opacity:1}],{duration:900,easing:"ease-out"});
+      c.animate([{translate:"0 -60vh",opacity:0},{translate:"0 0",opacity:1}],{duration:900,easing:"ease-out"});
       await wait(250);
     }
     await wait(1500); cap.innerHTML="";
-    endCard("UFO ĐÃ THỐNG TRỊ TRÁI ĐẤT",`Chỉ đúng ${right}/${total} câu. Về ôn lại Chương 7 rồi phục thù nhé!`,"var(--bad)");
+    resetCrowd();
+    document.querySelectorAll(".ufo-extra").forEach(e=>e.animate([{opacity:1},{opacity:0}],{duration:800,fill:"forwards"}).finished.then(()=>e.remove()));
+    stage.classList.remove("doom");
+    await revealFamily(TWIST_LOSE);
+    setAlien("laugh");
+    const rest=people.filter(p=>!p.gone);
+    for(let i=0;i<rest.length;i+=6){rest.slice(i,i+6).forEach(p=>{setFace(p,"surprised");abduct(p)});sfx.zap();await wait(450)}
+    await wait(2000); gulp(); hearts(8);
+    endCard("CẢ LỚP BỊ MỜI LÊN TÀU ÔN BÀI",`Chỉ đúng ${right}/${total} câu. Plot twist: UFO là một gia đình đi lạc, đang tìm cách xây dựng gia đình hạnh phúc… và giờ cả lớp phải lên tàu ôn lại Chương 7 cùng nhà họ!`,"var(--bad)");
   }
-}
-function puff(){
-  const u=ufoCenter(), d=document.createElement("div"), sz=20+Math.random()*30;
-  d.className="puff"; d.style.cssText+=`width:${sz}px;height:${sz}px;left:${u.x-sz/2+(Math.random()*120-60)}px;top:${u.y}px;position:fixed`;
-  document.body.appendChild(d);
-  d.animate([{transform:"translateY(0) scale(.5)",opacity:.9},{transform:`translateY(-${80+Math.random()*80}px) scale(1.8)`,opacity:0}],{duration:1300}).finished.then(()=>d.remove());
 }
 function endCard(title,text,color){
   card.className="card pop";
@@ -697,7 +1226,6 @@ function edImport(inp){
   });
   inp.value="";
 }
-
 /* ============ phím tắt ============ */
 document.addEventListener("keydown",e=>{
   if(state==="setup"||state==="edit")return;
@@ -709,7 +1237,7 @@ document.addEventListener("keydown",e=>{
   if(k==="KeyG")showHint(); else if(k==="KeyP")togglePause(); else if(k==="KeyR")reroll();
 });
 addEventListener("resize",()=>{if(state==="idle")homeUfo(0)});
-homeUfo(0); showSetup();
+setAlien("smirk"); homeUfo(0); showSetup();
 </script>
 </body>
 </html>

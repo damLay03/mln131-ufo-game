@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UFO xâm lăng – Ôn tập Nhóm 6</title>
+<style>
+:root{--sky1:#060a1c;--sky2:#171d48;--ok:#3ddc84;--bad:#ff5a6e;--ink:#eef2ff;--muted:#9aa3c7;--card:#11163a;--lime:#e8ff8a;--s:1}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:var(--sky1);color:var(--ink);font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif}
+button{font-family:inherit}
+#stage{position:fixed;inset:0;background:radial-gradient(ellipse at 50% 125%,#2d3175 0%,var(--sky2) 38%,var(--sky1) 78%);transition:background 1.5s}
+#stage.doom{background:radial-gradient(ellipse at 50% 125%,#b3132e 0%,#520b20 42%,#16030b 82%)}
+.star{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;opacity:.7;animation:tw 3s infinite ease-in-out}
+@keyframes tw{50%{opacity:.12}}
+#ground{position:absolute;left:0;right:0;bottom:0;height:14vh;background:linear-gradient(#1c3d2b,#0c1d15);border-top:2px solid #2f6b47}
+
+/* HUD */
+#hud{position:absolute;top:0;left:0;right:0;height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;z-index:20}
+.score{display:flex;gap:12px;font-size:20px;font-weight:700}
+.pill{padding:7px 14px;border-radius:999px;background:rgba(255,255,255,.08);white-space:nowrap}
+.pill b{font-size:24px}
+.pill.earth b{color:var(--ok)}.pill.ufo b{color:var(--bad)}
+#mainBtn{font-size:22px;font-weight:800;padding:12px 26px;border-radius:14px;border:0;cursor:pointer;background:var(--lime);color:#14180a;box-shadow:0 0 24px rgba(232,255,138,.45);transition:opacity .2s,transform .2s}
+#mainBtn:hover{transform:scale(1.04)}
+#mainBtn:disabled{opacity:0;pointer-events:none}
+.hbtn{background:rgba(255,255,255,.1);border:0;color:var(--ink);font-size:15px;padding:9px 13px;border-radius:9px;cursor:pointer;margin-left:6px}
+
+/* UFO */
+#ufo{position:absolute;width:220px;height:110px;left:calc(50% - 110px);top:90px;z-index:10;transition-property:left,top;transition-timing-function:cubic-bezier(.5,0,.3,1);transition-duration:.6s}
+.bob{width:100%;height:100%;position:relative;animation:bob 2.2s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-10px)}}
+.dome{position:absolute;left:60px;top:0;width:100px;height:62px;border-radius:50px 50px 12px 12px;background:radial-gradient(circle at 35% 28%,rgba(255,255,255,.75),rgba(140,220,255,.35) 42%,rgba(80,160,220,.22));border:2px solid rgba(180,230,255,.6);overflow:hidden}
+.pilot{position:absolute;left:32px;top:18px;width:36px;height:46px;background:#6fdc7a;border-radius:50% 50% 42% 42%}
+.pilot::before,.pilot::after{content:"";position:absolute;top:12px;width:10px;height:15px;background:#0b0f24;border-radius:50%}
+.pilot::before{left:6px;transform:rotate(-22deg)}.pilot::after{right:6px;transform:rotate(22deg)}
+.hull{position:absolute;left:0;top:46px;width:220px;height:46px;border-radius:50%;background:linear-gradient(#eef1f8,#8f98b2 58%,#59617e);box-shadow:0 8px 24px rgba(0,0,0,.55)}
+.rim{position:absolute;left:22px;top:66px;width:176px;display:flex;justify-content:space-around}
+.rim i{width:12px;height:12px;border-radius:50%;background:#7ef6ff;box-shadow:0 0 8px #7ef6ff;animation:blink 1s infinite}
+.rim i:nth-child(even){animation-delay:.5s;background:#ffd36e;box-shadow:0 0 8px #ffd36e}
+@keyframes blink{50%{opacity:.25}}
+.under{position:absolute;left:75px;top:84px;width:70px;height:16px;border-radius:0 0 50% 50%;background:#454c6b}
+#ufo.angry .rim i,.ufo-extra .rim i{background:var(--bad);box-shadow:0 0 10px var(--bad)}
+.shake{animation:shake .12s 6}
+@keyframes shake{25%{transform:translate(-6px,2px) rotate(-3deg)}75%{transform:translate(6px,-2px) rotate(3deg)}}
+
+/* beam */
+#beam{position:absolute;z-index:5;width:190px;clip-path:polygon(36% 0,64% 0,100% 100%,0 100%);background:linear-gradient(rgba(225,255,165,.9),rgba(190,255,140,.18));opacity:0;transition:opacity .25s;pointer-events:none}
+#beam.on{opacity:1;animation:flick .12s infinite alternate}
+#beam.red{background:linear-gradient(rgba(255,130,150,.95),rgba(255,90,110,.2))}
+@keyframes flick{to{filter:brightness(1.35)}}
+
+/* crowd */
+#crowd{position:absolute;left:3vw;right:3vw;bottom:2.5vh;display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-end;gap:calc(var(--s)*12px) calc(var(--s)*8px);z-index:6}
+.p{width:calc(var(--s)*100px);display:flex;flex-direction:column;align-items:center;transition:transform .3s,opacity .3s}
+.fig{position:relative;width:calc(var(--s)*44px);height:calc(var(--s)*62px)}
+.head{position:absolute;left:50%;top:0;width:calc(var(--s)*26px);height:calc(var(--s)*26px);transform:translateX(-50%);border-radius:50%;background:#f0c9a4}
+.body{position:absolute;left:50%;bottom:0;width:calc(var(--s)*42px);height:calc(var(--s)*34px);transform:translateX(-50%);border-radius:calc(var(--s)*18px) calc(var(--s)*18px) 6px 6px;background:var(--c)}
+.nm{margin-top:4px;font-size:calc(var(--s)*15px);font-weight:600;text-align:center;line-height:1.15;max-width:100%;background:rgba(0,0,0,.4);padding:2px 6px;border-radius:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.p.scan .fig{filter:drop-shadow(0 0 12px #e1ff9c)}
+.p.target{transform:translateY(-10px)}
+.p.target .nm{background:var(--lime);color:#111}
+.p.safe .nm{background:rgba(61,220,132,.28);box-shadow:0 0 0 2px var(--ok)}
+.p.safe .fig::after{content:"✓";position:absolute;top:-4px;right:calc(var(--s)*-12px);background:var(--ok);color:#03210f;border-radius:50%;width:calc(var(--s)*22px);height:calc(var(--s)*22px);font-size:calc(var(--s)*14px);font-weight:900;display:grid;place-items:center}
+.p.gone .fig{visibility:hidden}
+.p.gone .nm{text-decoration:line-through;opacity:.55}
+.p .lbl{font-size:calc(var(--s)*12px);color:var(--bad);font-weight:700;margin-top:2px;display:none}
+.p.gone .lbl{display:block}
+.p.absent{opacity:.3}
+
+/* caption */
+#caption{position:absolute;left:50%;top:24%;transform:translate(-50%,-50%);z-index:25;text-align:center;pointer-events:none;width:92vw}
+#caption h1{font-size:clamp(48px,7.5vw,104px);font-weight:900;text-shadow:0 6px 0 rgba(0,0,0,.45)}
+#caption p{font-size:clamp(22px,2.5vw,36px);margin-top:10px;font-weight:700;text-shadow:0 3px 8px rgba(0,0,0,.8)}
+.pop{animation:pop .55s cubic-bezier(.2,1.6,.4,1)}
+@keyframes pop{from{transform:scale(.3);opacity:0}}
+
+/* overlay cards */
+#overlay{position:absolute;inset:0;z-index:30;display:none;align-items:center;justify-content:center;background:rgba(3,5,18,.55)}
+#overlay.show{display:flex}
+.card{width:min(980px,92vw);max-height:92vh;overflow:auto;background:var(--card);border:2px solid #3a4590;border-radius:22px;padding:30px 40px;box-shadow:0 24px 70px rgba(0,0,0,.65)}
+.card.pop{animation:pop .4s cubic-bezier(.2,1.4,.4,1)}
+.tag{font-family:ui-monospace,Consolas,"Courier New",monospace;color:#9ff79f;letter-spacing:.14em;font-size:16px;font-weight:700}
+.to{font-size:24px;color:var(--muted);margin-top:8px}.to b{color:var(--lime)}
+.q{font-size:clamp(28px,3.4vw,46px);font-weight:800;line-height:1.28;margin:18px 0 10px;min-height:1.3em}
+.hint{font-size:24px;color:#ffd27a;min-height:32px}
+.trow{display:flex;align-items:center;gap:16px;margin:16px 0 6px}
+.timer{flex:1;height:18px;background:rgba(255,255,255,.1);border-radius:9px;overflow:hidden}
+.timer i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#ff5a6e,#ffd27a 35%,#9ff79f)}
+.tnum{font-size:34px;font-weight:900;width:70px;text-align:right}
+.tnum.low{color:var(--bad)}
+.btns{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
+.btn{font-size:20px;font-weight:800;padding:13px 22px;border-radius:12px;border:0;cursor:pointer}
+.btn.ok{background:var(--ok);color:#03210f}.btn.bad{background:var(--bad);color:#2a0008}
+.btn.ghost{background:rgba(255,255,255,.1);color:var(--ink)}
+.btn.main{background:var(--lime);color:#14180a}
+.btn small{opacity:.6;font-weight:600}
+.ans{font-size:clamp(26px,3vw,40px);font-weight:700;line-height:1.35;margin:14px 0}
+.by{font-size:24px;color:var(--muted)}.by b{color:var(--lime)}
+h2.big{font-size:clamp(40px,5.5vw,72px);font-weight:900;line-height:1.1;margin:8px 0}
+.lead{font-size:24px;color:var(--muted);line-height:1.45}
+label{display:block;font-weight:700;font-size:18px;margin:18px 0 8px}
+textarea,input[type=number]{width:100%;background:#0a0e28;color:var(--ink);border:1px solid #3a4590;border-radius:10px;padding:12px;font-size:17px;font-family:inherit}
+textarea{height:210px;resize:vertical}
+input[type=number]{width:110px}
+.cols{display:grid;grid-template-columns:1.2fr 1fr;gap:28px}
+.rules{font-size:17px;color:var(--muted);line-height:1.6}
+.rules b{color:var(--ink)}
+kbd{background:#2a3170;border-radius:5px;padding:1px 7px;font-family:inherit;font-weight:700;color:var(--ink)}
+.err{color:var(--bad);font-weight:700;min-height:24px;margin-top:8px}
+.puff{position:absolute;border-radius:50%;background:rgba(180,180,190,.7);z-index:11;pointer-events:none}
+.conf{position:fixed;width:12px;height:16px;z-index:24;pointer-events:none}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="stars"></div>
+  <div id="ground"></div>
+
+  <div id="hud">
+    <div class="score">
+      <span class="pill" id="qcount">Câu <b>0</b>/0</span>
+      <span class="pill earth">Trái Đất <b id="sRight">0</b></span>
+      <span class="pill ufo">UFO <b id="sWrong">0</b></span>
+    </div>
+    <button id="mainBtn" disabled onclick="hunt()">UFO SĂN MỒI ▶ <small>(Space)</small></button>
+    <div>
+      <button class="hbtn" id="muteBtn" onclick="toggleMute()">Âm thanh: bật</button>
+      <button class="hbtn" onclick="toggleFS()">Toàn màn hình</button>
+    </div>
+  </div>
+
+  <div id="beam"></div>
+  <div id="ufo"><div class="bob">
+    <div class="dome"><div class="pilot"></div></div>
+    <div class="hull"></div>
+    <div class="rim"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="under"></div>
+  </div></div>
+
+  <div id="crowd"></div>
+  <div id="caption"></div>
+  <div id="overlay"><div class="card" id="card"></div></div>
+</div>
+
+<script>
+/* ============ CÂU HỎI – sửa ở đây ============
+   q: câu hỏi · hint: gợi ý · a: đáp án hiện sau khi chấm · by: thành viên phụ trách giải thích */
+const QUESTIONS = [
+  {q:"Kể một yếu tố đang tác động đến gia đình Việt Nam hiện nay.",
+   hint:"Gợi ý: nghĩ tới kinh tế, công nghệ, hội nhập…",
+   a:"Một trong các yếu tố: kinh tế thị trường định hướng XHCN; công nghiệp hóa, hiện đại hóa; hội nhập quốc tế; cách mạng khoa học, công nghệ; chủ trương, chính sách của Đảng và Nhà nước.",
+   by:"Đức"},
+  {q:"Gia đình hạt nhân thường gồm những ai?",
+   hint:"Gợi ý: kiểu gia đình ít thế hệ nhất…",
+   a:"Vợ chồng và con cái chưa lập gia đình.",
+   by:"Bảo"},
+  {q:"Ngày nay, khi sinh con, các gia đình chủ động hơn về hai điều gì?",
+   hint:"Gợi ý: “bao nhiêu” và “khi nào”…",
+   a:"Chủ động về số lượng con và thời điểm sinh con.",
+   by:"Phúc"},
+  {q:"Kinh tế gia đình chuyển từ tự cấp tự túc sang hình thức nào?",
+   hint:"Gợi ý: làm ra không chỉ để dùng mà còn để bán…",
+   a:"Sang kinh tế sản xuất hàng hóa (và từ thị trường trong nước ra thị trường toàn cầu).",
+   by:"Phúc"},
+  {q:"Ngoài gia đình, việc giáo dục trẻ cần phối hợp với những ai?",
+   hint:"Gợi ý: nơi trẻ đi học, và…",
+   a:"Nhà trường và xã hội.",
+   by:"Việt"},
+  {q:"Ở riêng, không sống cùng bố mẹ, có phải là bất hiếu không? Vì sao?",
+   hint:"Gợi ý: điều quan trọng là cách mình đối xử…",
+   a:"Không. Cần đánh giá bằng hành vi chăm sóc, thăm hỏi và trách nhiệm cụ thể, không phải bằng việc ở chung hay ở riêng.",
+   by:"Nhân"},
+  {q:"Nêu một việc sinh viên có thể làm ngay để góp phần xây dựng gia đình.",
+   hint:"Gợi ý: một việc nhỏ khi về nhà…",
+   a:"Ví dụ: chia sẻ việc nhà, quan tâm ông bà cha mẹ, tôn trọng bình đẳng giới, học kỹ năng giao tiếp và giải quyết mâu thuẫn, phản đối bạo lực.",
+   by:"Minh Anh"},
+];
+
+/* Câu thoại khi bị hút – {n} là tên */
+const ABDUCT_LINES = [
+  "{n} đã được mời sang sao Hỏa học lại MLN131.",
+  "{n} bị đưa lên tàu rửa chén cho cả hạm đội.",
+  "{n} sẽ được trả về sau khi thuộc lòng Chương 7.",
+  "{n} lên tàu rồi. Nhớ gọi video về cho gia đình nhé!",
+  "{n} trở thành thực tập sinh ngoài hành tinh, không lương.",
+  "Hạm đội cần người giải thích gia đình hạt nhân. {n} được chọn.",
+  "{n} đi du học thiên hà, học bổng 0%.",
+];
+const SAFE_LINES = [
+  "{n} phản đòn bằng tia kiến thức. UFO choáng váng!",
+  "{n} an toàn, nhận kẹo!",
+  "Câu trả lời quá chuẩn. UFO run lẩy bẩy!",
+  "{n} vừa cứu cả Trái Đất một bàn.",
+];
+const SAMPLE_NAMES = ["An","Bình","Châu","Dũng","Giang","Hà","Khoa","Linh","Minh","Nam","Oanh","Phương","Quân","Trang","Uyên","Vy"];
+const COLORS = ["#ff8a5b","#5bc0ff","#ffd166","#b48cff","#4ce0b3","#ff6f91","#8bd450","#ffa94d","#74a9ff","#f78fb3"];
+
+/* ============ trạng thái ============ */
+const $ = s => document.querySelector(s);
+const stage=$("#stage"), ufo=$("#ufo"), beam=$("#beam"), crowd=$("#crowd"), cap=$("#caption"), overlay=$("#overlay"), card=$("#card");
+let people=[], qi=0, right=0, wrong=0, state="setup", current=null;
+let tTotal=20, tLeft=0, timerId=null, paused=false, lastTick=0, ufoX=0, ufoY=90, hintShown=false;
+const wait = ms => new Promise(r=>setTimeout(r,ms));
+const pick = a => a[Math.floor(Math.random()*a.length)];
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+for(let i=0;i<150;i++){const s=document.createElement("div");s.className="star";s.style.left=Math.random()*100+"vw";s.style.top=Math.random()*80+"vh";s.style.animationDelay=(Math.random()*3)+"s";if(Math.random()<.2){s.style.width=s.style.height="3px"}$("#stars").appendChild(s)}
+
+/* ============ âm thanh (tự tổng hợp, không cần file) ============ */
+let ac=null, muted=false;
+function actx(){ if(!ac){try{ac=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}} if(ac&&ac.state==="suspended")ac.resume(); return ac; }
+function tone(f,d=.15,type="sine",v=.15,f2=null,delay=0){
+  if(muted)return; const a=actx(); if(!a)return;
+  const t=a.currentTime+delay, o=a.createOscillator(), g=a.createGain();
+  o.type=type; o.frequency.setValueAtTime(f,t); if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d);
+  g.gain.setValueAtTime(v,t); g.gain.exponentialRampToValueAtTime(.001,t+d);
+  o.connect(g).connect(a.destination); o.start(t); o.stop(t+d+.03);
+}
+const sfx={
+  blip:()=>tone(1100,.04,"square",.03),
+  hum:()=>tone(130,.45,"sawtooth",.05,190),
+  lock:()=>{tone(523,.1,"square",.08);tone(784,.18,"square",.08,null,.1)},
+  tick:()=>tone(1300,.06,"square",.06),
+  ok:()=>[523,659,784,1047].forEach((f,i)=>tone(f,.2,"triangle",.14,null,i*.09)),
+  buzz:()=>tone(160,.5,"square",.09,110),
+  zap:()=>{tone(900,1.2,"sawtooth",.07,60);tone(300,.8,"square",.04,1400,.3)},
+  gulp:()=>tone(220,.3,"sine",.25,55),
+  win:()=>[392,523,659,784,1047,1319].forEach((f,i)=>tone(f,.28,"triangle",.13,null,i*.13)),
+  lose:()=>[392,330,262,196,131].forEach((f,i)=>tone(f,.4,"sawtooth",.08,null,i*.28)),
+};
+function toggleMute(){muted=!muted;$("#muteBtn").textContent="Âm thanh: "+(muted?"tắt":"bật")}
+function toggleFS(){try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}catch(e){}}
+
+/* ============ màn hình thiết lập ============ */
+function loadNames(){try{return localStorage.getItem("ufo_names")||""}catch(e){return ""}}
+function saveNames(v){try{localStorage.setItem("ufo_names",v)}catch(e){}}
+function showSetup(){
+  state="setup"; $("#mainBtn").disabled=true;
+  const saved=loadNames()||SAMPLE_NAMES.join("\n");
+  card.className="card pop";
+  card.innerHTML=`
+    <div class="tag">◉ CẢNH BÁO: PHÁT HIỆN VẬT THỂ LẠ</div>
+    <h2 class="big">UFO XÂM LĂNG</h2>
+    <div class="lead">Ôn tập · Xây dựng gia đình Việt Nam trong thời kỳ quá độ lên CNXH · Nhóm 6</div>
+    <div class="cols">
+      <div>
+        <label>Danh sách lớp (mỗi dòng một tên)</label>
+        <textarea id="names" spellcheck="false">${esc(saved)}</textarea>
+        <label>Thời gian mỗi câu (giây)</label>
+        <input type="number" id="secs" min="5" max="120" value="${tTotal}">
+        <div class="err" id="err"></div>
+      </div>
+      <div class="rules">
+        <label>Luật chơi</label>
+        UFO bay ngẫu nhiên, <b>hút trúng ai thì người đó trả lời</b> câu hỏi của người ngoài hành tinh.<br>
+        Đúng: <b>an toàn + nhận kẹo</b>.<br>
+        Sai hoặc hết giờ: <b>bị bắt lên UFO</b>.<br>
+        Hết ${QUESTIONS.length} câu: <b>hơn 50% đúng</b> thì UFO chán nản bỏ đi, ngược lại UFO thống trị Trái Đất.
+        <label>Phím tắt cho người điều khiển</label>
+        <kbd>Space</kbd> UFO săn / tiếp tục<br>
+        <kbd>D</kbd> đúng · <kbd>S</kbd> sai · <kbd>G</kbd> gợi ý<br>
+        <kbd>P</kbd> tạm dừng · <kbd>R</kbd> người này vắng, chọn lại
+      </div>
+    </div>
+    <div class="btns"><button class="btn main" onclick="startGame()">Bắt đầu ▶</button></div>`;
+  overlay.classList.add("show");
+}
+function startGame(){
+  actx();
+  const raw=$("#names").value; const names=raw.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+  if(!names.length){$("#err").textContent="Nhập ít nhất một tên nhé.";return}
+  saveNames(raw);
+  tTotal=Math.max(5,Math.min(120,parseInt($("#secs").value)||20));
+  buildCrowd(names);
+  qi=0;right=0;wrong=0;updateScore();
+  stage.classList.remove("doom"); document.querySelectorAll(".ufo-extra").forEach(e=>e.remove());
+  ufo.style.display="";ufo.classList.remove("angry");
+  overlay.classList.remove("show"); cap.innerHTML="";
+  homeUfo(); toIdle();
+}
+function buildCrowd(names){
+  crowd.innerHTML=""; people=[];
+  const n=names.length, s=n<=16?1:n<=26?.86:n<=36?.74:n<=48?.64:.56;
+  document.documentElement.style.setProperty("--s",s);
+  names.forEach((nm,i)=>{
+    const el=document.createElement("div"); el.className="p"; el.style.setProperty("--c",COLORS[i%COLORS.length]);
+    el.innerHTML=`<div class="fig"><div class="head"></div><div class="body"></div></div><div class="nm" title="${esc(nm)}">${esc(nm)}</div><div class="lbl">đã lên UFO</div>`;
+    crowd.appendChild(el);
+    people.push({name:nm,el,fig:el.querySelector(".fig"),gone:false,picked:false,absent:false});
+  });
+}
+function updateScore(){
+  $("#qcount").innerHTML=`Câu <b>${Math.min(qi+1,QUESTIONS.length)}</b>/${QUESTIONS.length}`;
+  $("#sRight").textContent=right; $("#sWrong").textContent=wrong;
+}
+
+/* ============ UFO di chuyển ============ */
+function setUfo(x,y,ms){ufo.style.transitionDuration=ms+"ms";ufoX=x;ufoY=y;ufo.style.left=x+"px";ufo.style.top=y+"px"}
+function homeUfo(ms=700){setUfo(innerWidth/2-110,90,ms)}
+function posFor(p){
+  const r=p.fig.getBoundingClientRect(), cx=r.left+r.width/2;
+  const x=Math.max(8,Math.min(innerWidth-228,cx-110));
+  const y=Math.max(78,r.top-250);
+  return {x,y,cx,r};
+}
+async function flyTo(p,ms){
+  document.querySelectorAll(".p.scan").forEach(e=>e.classList.remove("scan"));
+  const {x,y}=posFor(p); setUfo(x,y,ms); sfx.hum();
+  await wait(ms*.75); p.el.classList.add("scan"); await wait(ms*.25+60);
+}
+function beamOn(p,red=false){
+  const {cx,r}=posFor(p); const top=ufoY+92;
+  beam.style.left=(cx-95)+"px"; beam.style.top=top+"px"; beam.style.height=Math.max(40,r.bottom-top+6)+"px";
+  beam.classList.toggle("red",red); beam.classList.add("on");
+}
+function beamOff(){beam.classList.remove("on","red")}
+function ufoCenter(){const r=ufo.getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height*.6}}
+
+/* ============ vòng chơi ============ */
+function toIdle(){state="idle";$("#mainBtn").disabled=false;updateScore()}
+function candidates(){
+  let c=people.filter(p=>!p.gone&&!p.picked&&!p.absent);
+  if(!c.length)c=people.filter(p=>!p.gone&&!p.absent);
+  if(!c.length)c=people.filter(p=>!p.absent);
+  return c.length?c:people;
+}
+async function hunt(){
+  if(state!=="idle")return; state="hunting"; $("#mainBtn").disabled=true; cap.innerHTML="";
+  const target=pick(candidates());
+  const visible=people.filter(p=>!p.gone&&!p.absent);
+  const hops=5+Math.floor(Math.random()*3);
+  for(let i=0;i<hops;i++){await flyTo(pick(visible.length?visible:people),360+i*40)}
+  await flyTo(target,700);
+  document.querySelectorAll(".p.scan").forEach(e=>e.classList.remove("scan"));
+  target.el.classList.add("target"); sfx.lock(); beamOn(target);
+  await wait(800);
+  current=target; showQuestion();
+}
+async function showQuestion(){
+  state="question"; hintShown=false; paused=false;
+  const q=QUESTIONS[qi];
+  card.className="card pop";
+  card.innerHTML=`
+    <div class="tag">▌TÍN HIỆU TỪ UFO · CÂU ${qi+1}/${QUESTIONS.length}</div>
+    <div class="to">Người ngoài hành tinh hỏi <b>${esc(current.name)}</b>:</div>
+    <div class="q" id="qtext"></div>
+    <div class="hint" id="hint"></div>
+    <div class="trow"><div class="timer"><i id="tbar"></i></div><div class="tnum" id="tnum">${tTotal}</div></div>
+    <div class="btns">
+      <button class="btn ok" onclick="judge(true)">Đúng <small>(D)</small></button>
+      <button class="btn bad" onclick="judge(false)">Sai <small>(S)</small></button>
+      <button class="btn ghost" onclick="showHint()">Gợi ý <small>(G)</small></button>
+      <button class="btn ghost" id="pauseBtn" onclick="togglePause()">Tạm dừng <small>(P)</small></button>
+      <button class="btn ghost" onclick="reroll()">Vắng, chọn lại <small>(R)</small></button>
+    </div>`;
+  overlay.classList.add("show");
+  // hiệu ứng gõ chữ
+  const el=$("#qtext"), txt=q.q, step=Math.max(1,Math.round(txt.length/45));
+  for(let i=0;i<=txt.length;i+=step){ if(state!=="question")return; el.textContent=txt.slice(0,i); if(i%(step*3)===0)sfx.blip(); await wait(22); }
+  el.textContent=txt;
+  if(state==="question")startTimer();
+}
+function startTimer(){
+  tLeft=tTotal; lastTick=Math.ceil(tLeft); clearInterval(timerId);
+  timerId=setInterval(()=>{
+    if(paused||state!=="question")return;
+    tLeft=Math.max(0,tLeft-.1);
+    const bar=$("#tbar"), num=$("#tnum"); if(!bar)return;
+    bar.style.width=(tLeft/tTotal*100)+"%"; const c=Math.ceil(tLeft); num.textContent=c;
+    num.classList.toggle("low",tLeft<=5);
+    if(c<lastTick){lastTick=c; if(c<=5&&c>0)sfx.tick()}
+    if(tLeft<=0){judge(false,true)}
+  },100);
+}
+function showHint(){if(state!=="question")return;hintShown=true;$("#hint").textContent=QUESTIONS[qi].hint||""}
+function togglePause(){if(state!=="question")return;paused=!paused;const b=$("#pauseBtn");if(b)b.innerHTML=(paused?"Tiếp tục":"Tạm dừng")+" <small>(P)</small>"}
+async function reroll(){
+  if(state!=="question")return;
+  clearInterval(timerId); overlay.classList.remove("show"); beamOff();
+  current.el.classList.remove("target"); current.absent=true; current.el.classList.add("absent");
+  state="idle"; await wait(200); hunt();
+}
+async function judge(ok,timeout=false){
+  if(state!=="question")return; state="cutscene"; clearInterval(timerId);
+  overlay.classList.remove("show");
+  const p=current; p.picked=true;
+  if(ok){
+    right++; updateScore(); sfx.ok();
+    beam.classList.remove("on"); p.el.classList.remove("target"); p.el.classList.add("safe");
+    ufo.firstElementChild.classList.add("shake"); setTimeout(()=>ufo.firstElementChild.classList.remove("shake"),800);
+    confetti(p);
+    caption("CHÍNH XÁC!",pick(SAFE_LINES).replace("{n}",p.name),"var(--ok)");
+    await wait(2300);
+  }else{
+    wrong++; updateScore(); sfx.buzz(); ufo.classList.add("angry");
+    caption(timeout?"HẾT GIỜ!":"SAI RỒI!","","var(--bad)");
+    await wait(1000);
+    beamOn(p,true); sfx.zap(); await abduct(p);
+    sfx.gulp(); ufo.animate([{transform:"scale(1)"},{transform:"scale(1.18,.86)"},{transform:"scale(1)"}],{duration:450});
+    caption("BỊ BẮT CÓC!",pick(ABDUCT_LINES).replace("{n}",p.name),"var(--bad)");
+    beamOff(); ufo.classList.remove("angry");
+    await wait(2600);
+  }
+  showAnswer();
+}
+async function abduct(p){
+  const r=p.fig.getBoundingClientRect(), clone=p.fig.cloneNode(true);
+  const s=getComputedStyle(document.documentElement).getPropertyValue("--s");
+  clone.style.cssText=`position:fixed;left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;z-index:9;--s:${s};--c:${p.el.style.getPropertyValue("--c")}`;
+  document.body.appendChild(clone);
+  p.gone=true; p.el.classList.remove("target"); p.el.classList.add("gone");
+  const u=ufoCenter(), dx=u.x-(r.left+r.width/2), dy=u.y-(r.top+r.height/2);
+  const a=clone.animate([
+    {transform:"translate(0,0) rotate(0) scale(1)"},
+    {transform:"translate(-10px,-20px) rotate(-25deg) scale(1.1)",offset:.12},
+    {transform:"translate(10px,-30px) rotate(25deg) scale(1.1)",offset:.24},
+    {transform:`translate(${dx}px,${dy}px) rotate(900deg) scale(.05)`,opacity:.2}
+  ],{duration:1700,easing:"cubic-bezier(.55,0,.85,.5)"});
+  await a.finished; clone.remove();
+}
+function caption(title,line,color){
+  cap.innerHTML=`<h1 class="pop" style="color:${color}">${esc(title)}</h1>${line?`<p class="pop">${esc(line)}</p>`:""}`;
+}
+function confetti(p){
+  const r=p.fig.getBoundingClientRect(), x=r.left+r.width/2, y=r.top;
+  for(let i=0;i<45;i++){
+    const c=document.createElement("div"); c.className="conf"; c.style.left=x+"px"; c.style.top=y+"px";
+    c.style.background=pick(COLORS); document.body.appendChild(c);
+    const ang=Math.random()*Math.PI-Math.PI, v=150+Math.random()*260;
+    c.animate([{transform:"translate(0,0) rotate(0)",opacity:1},{transform:`translate(${Math.cos(ang)*v}px,${Math.sin(ang)*v+220}px) rotate(${Math.random()*720}deg)`,opacity:0}],{duration:1400+Math.random()*600,easing:"cubic-bezier(.2,.6,.4,1)"}).finished.then(()=>c.remove());
+  }
+}
+function showAnswer(){
+  state="answer"; cap.innerHTML="";
+  const q=QUESTIONS[qi];
+  card.className="card pop";
+  card.innerHTML=`
+    <div class="tag">▌GIẢI MÃ ĐÁP ÁN · CÂU ${qi+1}/${QUESTIONS.length}</div>
+    <div class="ans">${esc(q.a)}</div>
+    <div class="by">Mời <b>${esc(q.by)}</b> nói thêm một câu.</div>
+    <div class="btns"><button class="btn main" onclick="nextQ()">${qi+1<QUESTIONS.length?"Câu tiếp theo":"Xem kết cục"} ▶ <small>(Space)</small></button></div>`;
+  overlay.classList.add("show");
+}
+async function nextQ(){
+  if(state!=="answer")return;
+  overlay.classList.remove("show"); beamOff();
+  people.forEach(p=>p.el.classList.remove("target"));
+  qi++;
+  if(qi>=QUESTIONS.length){await ending();return}
+  homeUfo(); updateScore(); toIdle();
+}
+
+/* ============ kết cục ============ */
+async function ending(){
+  state="end"; $("#mainBtn").disabled=true; updateScore();
+  const total=QUESTIONS.length, win=right*2>total;
+  homeUfo(900); await wait(1000);
+  if(win){
+    caption("…","UFO: “Loài người hiểu bài quá… chán thật.”","var(--lime)");
+    ufo.firstElementChild.classList.add("shake");
+    for(let i=0;i<14;i++){puff();await wait(140)}
+    ufo.firstElementChild.classList.remove("shake");
+    // thả những người bị bắt về
+    people.filter(p=>p.gone).forEach((p,i)=>{
+      p.gone=false;p.el.classList.remove("gone");
+      p.fig.animate([{transform:"translateY(-60vh) scale(.2)",opacity:0},{transform:"translateY(0) scale(1)",opacity:1}],{duration:900,delay:i*120,easing:"cubic-bezier(.3,1.4,.5,1)"});
+    });
+    await wait(1200);
+    await ufo.animate([{transform:"translate(0,0) scale(1)"},{transform:"translate(-30px,20px) scale(1.05)",offset:.2},{transform:`translate(${innerWidth*.6}px,-${innerHeight*.5}px) scale(.08)`,opacity:.2}],{duration:1900,easing:"cubic-bezier(.6,0,.9,.6)"}).finished;
+    ufo.style.display="none"; sfx.win(); cap.innerHTML="";
+    endCard("TRÁI ĐẤT AN TOÀN!",`Đúng ${right}/${total} câu. UFO chán nản bỏ đi vì loài người hiểu bài quá. Ai bị bắt đã được thả về!`,"var(--ok)");
+  }else{
+    ufo.classList.add("angry"); caption("HA HA HA!","UFO: “Trái Đất là của chúng ta!”","var(--bad)");
+    stage.classList.add("doom"); sfx.lose();
+    for(let i=0;i<6;i++){
+      const c=ufo.cloneNode(true); c.removeAttribute("id"); c.className="ufo-extra angry";
+      c.style.cssText=`position:absolute;width:220px;height:110px;z-index:9;left:${Math.random()*(innerWidth-220)}px;top:${80+Math.random()*innerHeight*.28}px;transform:scale(${.4+Math.random()*.4})`;
+      stage.appendChild(c);
+      c.animate([{transform:`translateY(-60vh) scale(.3)`,opacity:0},{transform:c.style.transform,opacity:1}],{duration:900,easing:"ease-out"});
+      await wait(250);
+    }
+    await wait(1500); cap.innerHTML="";
+    endCard("UFO ĐÃ THỐNG TRỊ TRÁI ĐẤT",`Chỉ đúng ${right}/${total} câu. Về ôn lại Chương 7 rồi phục thù nhé!`,"var(--bad)");
+  }
+}
+function puff(){
+  const u=ufoCenter(), d=document.createElement("div"), sz=20+Math.random()*30;
+  d.className="puff"; d.style.cssText+=`width:${sz}px;height:${sz}px;left:${u.x-sz/2+(Math.random()*120-60)}px;top:${u.y}px;position:fixed`;
+  document.body.appendChild(d);
+  d.animate([{transform:"translateY(0) scale(.5)",opacity:.9},{transform:`translateY(-${80+Math.random()*80}px) scale(1.8)`,opacity:0}],{duration:1300}).finished.then(()=>d.remove());
+}
+function endCard(title,text,color){
+  card.className="card pop";
+  card.innerHTML=`<div class="tag">▌KẾT CỤC</div><h2 class="big" style="color:${color}">${esc(title)}</h2><div class="lead">${esc(text)}</div>
+    <div class="btns"><button class="btn ghost" onclick="showSetup()">Chơi lại</button></div>`;
+  overlay.classList.add("show");
+}
+
+/* ============ phím tắt ============ */
+document.addEventListener("keydown",e=>{
+  if(state==="setup")return;
+  const k=e.code;
+  if(k==="Space"){e.preventDefault(); if(state==="idle")hunt(); else if(state==="answer")nextQ(); return}
+  if(state!=="question")return;
+  if(k==="KeyD")judge(true); else if(k==="KeyS")judge(false);
+  else if(k==="KeyG")showHint(); else if(k==="KeyP")togglePause(); else if(k==="KeyR")reroll();
+});
+addEventListener("resize",()=>{if(state==="idle")homeUfo(0)});
+homeUfo(0); showSetup();
+</script>
+</body>
+</html>

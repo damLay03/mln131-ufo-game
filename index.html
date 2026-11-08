@@ -82,7 +82,34 @@ button{font-family:inherit}
 .card.pop{animation:pop .4s cubic-bezier(.2,1.4,.4,1)}
 .tag{font-family:ui-monospace,Consolas,"Courier New",monospace;color:#9ff79f;letter-spacing:.14em;font-size:16px;font-weight:700}
 .to{font-size:24px;color:var(--muted);margin-top:8px}.to b{color:var(--lime)}
-.q{font-size:clamp(28px,3.4vw,46px);font-weight:800;line-height:1.28;margin:18px 0 10px;min-height:1.3em}
+.q{font-size:clamp(26px,3vw,42px);font-weight:800;line-height:1.28;margin:16px 0 8px;min-height:1.3em}
+.q.sm{font-size:clamp(20px,2vw,28px);color:var(--muted);margin:10px 0 0}
+/* phương án trắc nghiệm */
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0 4px}
+.optb{display:flex;gap:14px;align-items:center;text-align:left;font-size:clamp(19px,1.9vw,27px);font-weight:700;line-height:1.3;padding:12px 16px;border-radius:14px;border:2px solid #3a4590;background:#0a0e28;color:var(--ink);cursor:pointer;transition:border-color .15s,background .15s,opacity .3s}
+.optb .L{flex:none;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:#2a3170;font-weight:900}
+.optb:hover:not(:disabled){border-color:var(--lime)}
+.optb:disabled{cursor:default}
+.optb.right{border-color:var(--ok);background:rgba(61,220,132,.22)}.optb.right .L{background:var(--ok);color:#03210f}
+.optb.wrong{border-color:var(--bad);background:rgba(255,90,110,.22)}.optb.wrong .L{background:var(--bad);color:#2a0008}
+.opts.done .optb:not(.right):not(.wrong){opacity:.4}
+.good{color:var(--ok);font-weight:900}
+/* trình sửa câu hỏi */
+.qed{border:1px solid #3a4590;border-radius:14px;padding:14px 16px;margin:14px 0;background:rgba(255,255,255,.02)}
+.qhead{display:flex;justify-content:space-between;align-items:center;font-size:19px;margin-bottom:8px}
+.qed textarea,.qed input[type=text]{width:100%;height:auto;background:#0a0e28;color:var(--ink);border:1px solid #3a4590;border-radius:9px;padding:9px 11px;font-size:16px;font-family:inherit;resize:vertical}
+.qed .sub{font-size:14px;font-weight:700;color:var(--muted);margin:10px 0 4px}
+.orow{display:flex;align-items:center;gap:8px;margin:6px 0}
+.orow input[type=radio]{width:22px;height:22px;accent-color:var(--ok);flex:none;cursor:pointer}
+.orow .L{flex:none;width:26px;font-weight:900;text-align:center}
+.orow.isright input[type=text]{border-color:var(--ok)}
+.mini{background:rgba(255,255,255,.1);border:0;color:var(--ink);font-size:14px;padding:6px 10px;border-radius:8px;cursor:pointer;margin-left:4px}
+.mini:disabled{opacity:.3;cursor:default}
+.mini.del{color:#ffb3bd}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.bar{position:sticky;bottom:-30px;background:var(--card);padding:12px 0 6px;border-top:1px solid #3a4590}
+.note{font-size:16px;color:var(--muted);margin-top:6px}
+@media(max-width:720px){.opts,.two,.cols{grid-template-columns:1fr}.card{padding:22px 18px}}
 .hint{font-size:24px;color:#ffd27a;min-height:32px}
 .trow{display:flex;align-items:center;gap:16px;margin:16px 0 6px}
 .timer{flex:1;height:18px;background:rgba(255,255,255,.1);border-radius:9px;overflow:hidden}
@@ -144,38 +171,70 @@ kbd{background:#2a3170;border-radius:5px;padding:1px 7px;font-family:inherit;fon
 </div>
 
 <script>
-/* ============ CÂU HỎI – sửa ở đây ============
-   q: câu hỏi · hint: gợi ý · a: đáp án hiện sau khi chấm · by: thành viên phụ trách giải thích */
-const QUESTIONS = [
-  {q:"Kể một yếu tố đang tác động đến gia đình Việt Nam hiện nay.",
+/* ============ CÂU HỎI MẶC ĐỊNH ============
+   Có thể sửa ngay trong game: màn hình đầu → "Sửa câu hỏi".
+   q: câu hỏi · options: các phương án (2–6) · correct: số thứ tự phương án đúng, đếm từ 0 (0 = A, 1 = B…)
+   hint: gợi ý · explain: giải thích sau khi chấm · by: thành viên phụ trách nói thêm */
+const DEFAULT_QUESTIONS = [
+  {q:"Yếu tố nào sau đây đang tác động đến sự biến đổi của gia đình Việt Nam hiện nay?",
+   options:["Chế độ phong kiến tập quyền","Công nghiệp hóa, hiện đại hóa và hội nhập quốc tế","Nền kinh tế tự cấp tự túc","Tục đa thê"],
+   correct:1,
    hint:"Gợi ý: nghĩ tới kinh tế, công nghệ, hội nhập…",
-   a:"Một trong các yếu tố: kinh tế thị trường định hướng XHCN; công nghiệp hóa, hiện đại hóa; hội nhập quốc tế; cách mạng khoa học, công nghệ; chủ trương, chính sách của Đảng và Nhà nước.",
+   explain:"Các yếu tố tác động gồm: kinh tế thị trường định hướng XHCN; công nghiệp hóa, hiện đại hóa; hội nhập quốc tế; cách mạng khoa học, công nghệ; chủ trương, chính sách của Đảng và Nhà nước.",
    by:"Đức"},
   {q:"Gia đình hạt nhân thường gồm những ai?",
+   options:["Vợ chồng và con cái chưa lập gia đình","Ông bà, cha mẹ và con cháu cùng sống chung","Nhiều anh em đã lập gia đình sống chung một nhà","Chỉ có ông bà và cháu"],
+   correct:0,
    hint:"Gợi ý: kiểu gia đình ít thế hệ nhất…",
-   a:"Vợ chồng và con cái chưa lập gia đình.",
+   explain:"Gia đình hạt nhân (gia đình đơn) gồm hai thế hệ: vợ chồng và con cái chưa lập gia đình.",
    by:"Bảo"},
-  {q:"Ngày nay, khi sinh con, các gia đình chủ động hơn về hai điều gì?",
+  {q:"Ngày nay, khi sinh con, các gia đình chủ động hơn về điều gì?",
+   options:["Giới tính và ngoại hình của con","Nghề nghiệp tương lai của con","Số lượng con và thời điểm sinh con","Nơi con sẽ sống khi trưởng thành"],
+   correct:2,
    hint:"Gợi ý: “bao nhiêu” và “khi nào”…",
-   a:"Chủ động về số lượng con và thời điểm sinh con.",
+   explain:"Nhờ y học hiện đại và chính sách dân số, các gia đình chủ động về số lượng con và thời điểm sinh con.",
    by:"Phúc"},
-  {q:"Kinh tế gia đình chuyển từ tự cấp tự túc sang hình thức nào?",
+  {q:"Kinh tế gia đình Việt Nam đang chuyển từ tự cấp tự túc sang hình thức nào?",
+   options:["Kinh tế bao cấp","Kinh tế hiện vật, trao đổi ngang giá","Kinh tế tập thể theo hợp tác xã","Kinh tế sản xuất hàng hóa"],
+   correct:3,
    hint:"Gợi ý: làm ra không chỉ để dùng mà còn để bán…",
-   a:"Sang kinh tế sản xuất hàng hóa (và từ thị trường trong nước ra thị trường toàn cầu).",
+   explain:"Kinh tế gia đình chuyển sang sản xuất hàng hóa, từ thị trường trong nước ra thị trường toàn cầu.",
    by:"Phúc"},
   {q:"Ngoài gia đình, việc giáo dục trẻ cần phối hợp với những ai?",
+   options:["Chỉ cần gia đình là đủ","Nhà trường và xã hội","Chỉ mạng xã hội","Chỉ hàng xóm"],
+   correct:1,
    hint:"Gợi ý: nơi trẻ đi học, và…",
-   a:"Nhà trường và xã hội.",
+   explain:"Giáo dục gia đình cần gắn với giáo dục của nhà trường và xã hội.",
    by:"Việt"},
-  {q:"Ở riêng, không sống cùng bố mẹ, có phải là bất hiếu không? Vì sao?",
+  {q:"Ở riêng, không sống cùng bố mẹ, có phải là bất hiếu không?",
+   options:["Có, ở riêng luôn là bất hiếu","Chỉ bất hiếu nếu là con trưởng","Không, điều quan trọng là sự chăm sóc, thăm hỏi và trách nhiệm cụ thể","Chỉ được ở riêng khi bố mẹ đã mất"],
+   correct:2,
    hint:"Gợi ý: điều quan trọng là cách mình đối xử…",
-   a:"Không. Cần đánh giá bằng hành vi chăm sóc, thăm hỏi và trách nhiệm cụ thể, không phải bằng việc ở chung hay ở riêng.",
+   explain:"Không. Cần đánh giá bằng hành vi chăm sóc, thăm hỏi và trách nhiệm cụ thể, không phải bằng việc ở chung hay ở riêng.",
    by:"Nhân"},
-  {q:"Nêu một việc sinh viên có thể làm ngay để góp phần xây dựng gia đình.",
+  {q:"Việc nào sau đây sinh viên có thể làm ngay để góp phần xây dựng gia đình?",
+   options:["Chia sẻ việc nhà, quan tâm ông bà, cha mẹ","Để mọi việc nhà cho mẹ vì mẹ quen rồi","Im lặng khi thấy bạo lực gia đình","Chỉ về nhà khi cần xin tiền"],
+   correct:0,
    hint:"Gợi ý: một việc nhỏ khi về nhà…",
-   a:"Ví dụ: chia sẻ việc nhà, quan tâm ông bà cha mẹ, tôn trọng bình đẳng giới, học kỹ năng giao tiếp và giải quyết mâu thuẫn, phản đối bạo lực.",
+   explain:"Ví dụ: chia sẻ việc nhà, quan tâm ông bà cha mẹ, tôn trọng bình đẳng giới, học kỹ năng giao tiếp và giải quyết mâu thuẫn, phản đối bạo lực.",
    by:"Minh Anh"},
 ];
+const LETTERS="ABCDEF", MAX_OPTS=6;
+const clone = o => JSON.parse(JSON.stringify(o));
+/* Chuẩn hóa một bộ câu hỏi (từ bộ nhớ trình duyệt hoặc file nhập). Trả null nếu không dùng được. */
+function normalizeQuestions(arr){
+  if(!Array.isArray(arr))return null;
+  const out=arr.filter(x=>x&&typeof x==="object").map(x=>{
+    const options=(Array.isArray(x.options)?x.options:[]).slice(0,MAX_OPTS).map(o=>String(o??""));
+    while(options.length<2)options.push("");
+    let correct=parseInt(x.correct); if(!(correct>=0&&correct<options.length))correct=0;
+    return {q:String(x.q??""),options,correct,hint:String(x.hint??""),explain:String(x.explain??x.a??""),by:String(x.by??"")};
+  });
+  return out.length?out:null;
+}
+function loadQuestions(){try{return normalizeQuestions(JSON.parse(localStorage.getItem("ufo_questions")))}catch(e){return null}}
+function storeQuestions(qs){try{qs?localStorage.setItem("ufo_questions",JSON.stringify(qs)):localStorage.removeItem("ufo_questions");return true}catch(e){return false}}
+let QUESTIONS = loadQuestions() || clone(DEFAULT_QUESTIONS);
 
 /* Câu thoại khi bị hút – {n} là tên */
 const ABDUCT_LINES = [
@@ -236,7 +295,7 @@ function toggleFS(){try{document.fullscreenElement?document.exitFullscreen():doc
 function loadNames(){try{return localStorage.getItem("ufo_names")||""}catch(e){return ""}}
 function saveNames(v){try{localStorage.setItem("ufo_names",v)}catch(e){}}
 function showSetup(){
-  state="setup"; $("#mainBtn").disabled=true;
+  state="setup"; $("#mainBtn").disabled=true; card.scrollTop=0;
   const saved=loadNames()||SAMPLE_NAMES.join("\n");
   card.className="card pop";
   card.innerHTML=`
@@ -249,29 +308,36 @@ function showSetup(){
         <textarea id="names" spellcheck="false">${esc(saved)}</textarea>
         <label>Thời gian mỗi câu (giây)</label>
         <input type="number" id="secs" min="5" max="120" value="${tTotal}">
+        <label>Bộ câu hỏi</label>
+        <div class="note">${QUESTIONS.length} câu trắc nghiệm · ${loadQuestions()?"bộ đã sửa":"bộ mặc định"}</div>
+        <div class="btns" style="margin-top:8px"><button class="btn ghost" onclick="openEditor()">✎ Sửa câu hỏi</button></div>
         <div class="err" id="err"></div>
       </div>
       <div class="rules">
         <label>Luật chơi</label>
-        UFO bay ngẫu nhiên, <b>hút trúng ai thì người đó trả lời</b> câu hỏi của người ngoài hành tinh.<br>
+        UFO bay ngẫu nhiên, <b>hút trúng ai thì người đó chọn đáp án</b> cho câu hỏi trắc nghiệm của người ngoài hành tinh.<br>
         Đúng: <b>an toàn + nhận kẹo</b>.<br>
         Sai hoặc hết giờ: <b>bị bắt lên UFO</b>.<br>
         Hết ${QUESTIONS.length} câu: <b>hơn 50% đúng</b> thì UFO chán nản bỏ đi, ngược lại UFO thống trị Trái Đất.
         <label>Phím tắt cho người điều khiển</label>
         <kbd>Space</kbd> UFO săn / tiếp tục<br>
-        <kbd>D</kbd> đúng · <kbd>S</kbd> sai · <kbd>G</kbd> gợi ý<br>
-        <kbd>P</kbd> tạm dừng · <kbd>R</kbd> người này vắng, chọn lại
+        <kbd>A</kbd>–<kbd>D</kbd> hoặc <kbd>1</kbd>–<kbd>4</kbd> chọn đáp án<br>
+        <kbd>G</kbd> gợi ý · <kbd>P</kbd> tạm dừng · <kbd>R</kbd> người này vắng, chọn lại
       </div>
     </div>
     <div class="btns"><button class="btn main" onclick="startGame()">Bắt đầu ▶</button></div>`;
   overlay.classList.add("show");
 }
+function readSetup(){
+  const n=$("#names"), s=$("#secs");
+  if(n)saveNames(n.value);
+  if(s)tTotal=Math.max(5,Math.min(120,parseInt(s.value)||20));
+}
 function startGame(){
   actx();
   const raw=$("#names").value; const names=raw.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
   if(!names.length){$("#err").textContent="Nhập ít nhất một tên nhé.";return}
-  saveNames(raw);
-  tTotal=Math.max(5,Math.min(120,parseInt($("#secs").value)||20));
+  readSetup();
   buildCrowd(names);
   qi=0;right=0;wrong=0;updateScore();
   stage.classList.remove("doom"); document.querySelectorAll(".ufo-extra").forEach(e=>e.remove());
@@ -345,11 +411,10 @@ async function showQuestion(){
     <div class="tag">▌TÍN HIỆU TỪ UFO · CÂU ${qi+1}/${QUESTIONS.length}</div>
     <div class="to">Người ngoài hành tinh hỏi <b>${esc(current.name)}</b>:</div>
     <div class="q" id="qtext"></div>
+    <div class="opts" id="opts">${q.options.map((o,j)=>`<button class="optb" onclick="choose(${j})"><span class="L">${LETTERS[j]}</span><span>${esc(o)}</span></button>`).join("")}</div>
     <div class="hint" id="hint"></div>
     <div class="trow"><div class="timer"><i id="tbar"></i></div><div class="tnum" id="tnum">${tTotal}</div></div>
     <div class="btns">
-      <button class="btn ok" onclick="judge(true)">Đúng <small>(D)</small></button>
-      <button class="btn bad" onclick="judge(false)">Sai <small>(S)</small></button>
       <button class="btn ghost" onclick="showHint()">Gợi ý <small>(G)</small></button>
       <button class="btn ghost" id="pauseBtn" onclick="togglePause()">Tạm dừng <small>(P)</small></button>
       <button class="btn ghost" onclick="reroll()">Vắng, chọn lại <small>(R)</small></button>
@@ -370,8 +435,22 @@ function startTimer(){
     bar.style.width=(tLeft/tTotal*100)+"%"; const c=Math.ceil(tLeft); num.textContent=c;
     num.classList.toggle("low",tLeft<=5);
     if(c<lastTick){lastTick=c; if(c<=5&&c>0)sfx.tick()}
-    if(tLeft<=0){judge(false,true)}
+    if(tLeft<=0){choose(-1)}
   },100);
+}
+/* Chọn phương án j (j = -1 nghĩa là hết giờ): tô đáp án rồi mới chấm */
+async function choose(j){
+  if(state!=="question")return;
+  const q=QUESTIONS[qi]; if(j>=q.options.length)return;
+  state="reveal"; clearInterval(timerId);
+  const box=$("#opts"), bs=box?[...box.children]:[];
+  bs.forEach(b=>b.disabled=true); if(box)box.classList.add("done");
+  if(bs[j]&&j!==q.correct)bs[j].classList.add("wrong");
+  if(j>=0)sfx.lock();
+  await wait(j<0?200:700);
+  if(bs[q.correct])bs[q.correct].classList.add("right");
+  await wait(1500);
+  judge(j===q.correct,j<0);
 }
 function showHint(){if(state!=="question")return;hintShown=true;$("#hint").textContent=QUESTIONS[qi].hint||""}
 function togglePause(){if(state!=="question")return;paused=!paused;const b=$("#pauseBtn");if(b)b.innerHTML=(paused?"Tiếp tục":"Tạm dừng")+" <small>(P)</small>"}
@@ -382,7 +461,7 @@ async function reroll(){
   state="idle"; await wait(200); hunt();
 }
 async function judge(ok,timeout=false){
-  if(state!=="question")return; state="cutscene"; clearInterval(timerId);
+  if(state!=="reveal")return; state="cutscene"; clearInterval(timerId);
   overlay.classList.remove("show");
   const p=current; p.picked=true;
   if(ok){
@@ -437,8 +516,10 @@ function showAnswer(){
   card.className="card pop";
   card.innerHTML=`
     <div class="tag">▌GIẢI MÃ ĐÁP ÁN · CÂU ${qi+1}/${QUESTIONS.length}</div>
-    <div class="ans">${esc(q.a)}</div>
-    <div class="by">Mời <b>${esc(q.by)}</b> nói thêm một câu.</div>
+    <div class="q sm">${esc(q.q)}</div>
+    <div class="ans"><span class="good">Đáp án ${LETTERS[q.correct]}.</span> ${esc(q.options[q.correct])}</div>
+    ${q.explain?`<div class="lead">${esc(q.explain)}</div>`:""}
+    ${q.by?`<div class="by" style="margin-top:12px">Mời <b>${esc(q.by)}</b> nói thêm một câu.</div>`:""}
     <div class="btns"><button class="btn main" onclick="nextQ()">${qi+1<QUESTIONS.length?"Câu tiếp theo":"Xem kết cục"} ▶ <small>(Space)</small></button></div>`;
   overlay.classList.add("show");
 }
@@ -497,14 +578,135 @@ function endCard(title,text,color){
   overlay.classList.add("show");
 }
 
+/* ============ trình sửa câu hỏi ============ */
+let draft=null;
+function openEditor(){
+  readSetup();
+  draft=clone(QUESTIONS); state="edit"; renderEditor(); card.scrollTop=0;
+}
+function renderEditor(){
+  const y=card.scrollTop;
+  card.className="card";
+  card.innerHTML=`
+    <div class="tag">▌BỘ CÂU HỎI TRẮC NGHIỆM</div>
+    <h2 class="big" style="font-size:clamp(30px,3.6vw,46px)">Sửa câu hỏi</h2>
+    <div class="note">Bấm vào ô tròn cạnh phương án đúng. Câu hỏi được lưu trong trình duyệt của máy này. Muốn dùng trên máy khác thì bấm <b>Xuất file</b>, rồi bên máy kia bấm <b>Nhập file</b>.</div>
+    ${draft.map(qBlock).join("")}
+    <div class="btns"><button class="btn ghost" onclick="edAdd()">+ Thêm câu hỏi</button></div>
+    <div class="bar">
+      <div class="err" id="err" style="margin:0 0 6px"></div>
+      <div class="btns" style="margin:0">
+        <button class="btn main" onclick="edSave()">Lưu và quay lại</button>
+        <button class="btn ghost" onclick="edCancel()">Hủy</button>
+        <button class="btn ghost" onclick="edExport()">Xuất file</button>
+        <button class="btn ghost" onclick="$('#impFile').click()">Nhập file</button>
+        <button class="btn ghost" onclick="edReset()">Khôi phục mặc định</button>
+        <input type="file" id="impFile" accept=".json,application/json" style="display:none" onchange="edImport(this)">
+      </div>
+    </div>`;
+  overlay.classList.add("show");
+  card.scrollTop=y;
+}
+function qBlock(q,i){
+  const opts=q.options.map((o,j)=>`
+    <div class="orow${j===q.correct?" isright":""}">
+      <input type="radio" name="c${i}" title="Đáp án đúng" ${j===q.correct?"checked":""} onchange="edCorrect(${i},${j})">
+      <span class="L">${LETTERS[j]}</span>
+      <input type="text" value="${esc(o)}" placeholder="Phương án ${LETTERS[j]}" oninput="draft[${i}].options[${j}]=this.value">
+      <button class="mini del" title="Xóa phương án" onclick="edDelOpt(${i},${j})" ${q.options.length<=2?"disabled":""}>✕</button>
+    </div>`).join("");
+  return `<div class="qed">
+    <div class="qhead"><b>Câu ${i+1}</b><span>
+      <button class="mini" title="Đưa lên" onclick="edMove(${i},-1)" ${i===0?"disabled":""}>↑</button>
+      <button class="mini" title="Đưa xuống" onclick="edMove(${i},1)" ${i===draft.length-1?"disabled":""}>↓</button>
+      <button class="mini del" onclick="edDel(${i})" ${draft.length<=1?"disabled":""}>Xóa câu</button></span></div>
+    <textarea rows="2" placeholder="Nội dung câu hỏi" oninput="draft[${i}].q=this.value">${esc(q.q)}</textarea>
+    <div class="sub">Phương án (chọn ô tròn ở phương án đúng)</div>
+    ${opts}
+    ${q.options.length<MAX_OPTS?`<button class="mini" style="margin:4px 0 0 34px" onclick="edAddOpt(${i})">+ Thêm phương án</button>`:""}
+    <div class="two">
+      <div><div class="sub">Gợi ý (không bắt buộc)</div><input type="text" value="${esc(q.hint)}" oninput="draft[${i}].hint=this.value"></div>
+      <div><div class="sub">Người nói thêm (không bắt buộc)</div><input type="text" value="${esc(q.by)}" oninput="draft[${i}].by=this.value"></div>
+    </div>
+    <div class="sub">Giải thích hiện sau khi chấm (không bắt buộc)</div>
+    <textarea rows="2" oninput="draft[${i}].explain=this.value">${esc(q.explain)}</textarea>
+  </div>`;
+}
+function edCorrect(i,j){draft[i].correct=j;renderEditor()}
+function edAddOpt(i){if(draft[i].options.length<MAX_OPTS){draft[i].options.push("");renderEditor()}}
+function edDelOpt(i,j){
+  const q=draft[i]; if(q.options.length<=2)return;
+  q.options.splice(j,1);
+  if(q.correct===j)q.correct=0; else if(q.correct>j)q.correct--;
+  renderEditor();
+}
+function edAdd(){
+  draft.push({q:"",options:["","","",""],correct:0,hint:"",explain:"",by:""});
+  renderEditor(); card.scrollTop=card.scrollHeight;
+}
+function edDel(i){
+  if(draft.length<=1)return;
+  if(!confirm(`Xóa câu ${i+1}?`))return;
+  draft.splice(i,1); renderEditor();
+}
+function edMove(i,d){
+  const k=i+d; if(k<0||k>=draft.length)return;
+  [draft[i],draft[k]]=[draft[k],draft[i]]; renderEditor();
+}
+/* Kiểm tra và làm gọn: bỏ phương án trống, giữ đúng phương án được chọn */
+function edValidate(){
+  const out=[];
+  for(let i=0;i<draft.length;i++){
+    const d=draft[i], n=`Câu ${i+1}`;
+    if(!d.q.trim())return {err:`${n}: chưa có nội dung câu hỏi.`};
+    if(!(d.options[d.correct]||"").trim())return {err:`${n}: phương án đúng (${LETTERS[d.correct]}) đang để trống.`};
+    const options=[]; let correct=0;
+    d.options.forEach((o,j)=>{if(o.trim()){if(j===d.correct)correct=options.length;options.push(o.trim())}});
+    if(options.length<2)return {err:`${n}: cần ít nhất 2 phương án có nội dung.`};
+    out.push({q:d.q.trim(),options,correct,hint:d.hint.trim(),explain:d.explain.trim(),by:d.by.trim()});
+  }
+  return {qs:out};
+}
+function edSave(){
+  const r=edValidate(); if(r.err){$("#err").textContent=r.err;return}
+  QUESTIONS=r.qs;
+  const isDefault=JSON.stringify(QUESTIONS)===JSON.stringify(DEFAULT_QUESTIONS);
+  if(!storeQuestions(isDefault?null:QUESTIONS)){alert("Trình duyệt không cho lưu. Câu hỏi chỉ dùng được đến khi tải lại trang; hãy Xuất file để giữ lại.")}
+  draft=null; showSetup();
+}
+function edCancel(){
+  if(JSON.stringify(draft)!==JSON.stringify(QUESTIONS)&&!confirm("Bỏ các thay đổi chưa lưu?"))return;
+  draft=null; showSetup();
+}
+function edReset(){
+  if(!confirm("Thay toàn bộ câu hỏi bằng bộ mặc định? Bấm Lưu thì mới áp dụng."))return;
+  draft=clone(DEFAULT_QUESTIONS); renderEditor(); card.scrollTop=0;
+}
+function edExport(){
+  const blob=new Blob([JSON.stringify(draft,null,2)],{type:"application/json"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="cau-hoi-ufo.json";
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+function edImport(inp){
+  const f=inp.files&&inp.files[0]; if(!f)return;
+  f.text().then(t=>{
+    let qs=null; try{qs=normalizeQuestions(JSON.parse(t))}catch(e){}
+    if(!qs){$("#err").textContent="File không đúng định dạng câu hỏi.";return}
+    draft=qs; renderEditor(); card.scrollTop=0;
+    $("#err").textContent=`Đã nhập ${qs.length} câu. Bấm Lưu để áp dụng.`;
+  });
+  inp.value="";
+}
+
 /* ============ phím tắt ============ */
 document.addEventListener("keydown",e=>{
-  if(state==="setup")return;
+  if(state==="setup"||state==="edit")return;
   const k=e.code;
   if(k==="Space"){e.preventDefault(); if(state==="idle")hunt(); else if(state==="answer")nextQ(); return}
   if(state!=="question")return;
-  if(k==="KeyD")judge(true); else if(k==="KeyS")judge(false);
-  else if(k==="KeyG")showHint(); else if(k==="KeyP")togglePause(); else if(k==="KeyR")reroll();
+  let m=k.match(/^(?:Digit|Numpad)([1-6])$/); if(m){choose(+m[1]-1);return}
+  m=k.match(/^Key([A-F])$/); if(m){choose(LETTERS.indexOf(m[1]));return}
+  if(k==="KeyG")showHint(); else if(k==="KeyP")togglePause(); else if(k==="KeyR")reroll();
 });
 addEventListener("resize",()=>{if(state==="idle")homeUfo(0)});
 homeUfo(0); showSetup();
